@@ -1,13 +1,11 @@
-// app/(user)/bookmarks/page.tsx
-// Create this new file
 import { CourseCard } from '@/components/CourseCard'
+import { GetCoursesQueryResult } from '@/sanity.types'
 import { getBookmarks } from '@/sanity/lib/bookmarks/getBookmarks'
 import { getStudentByClerkId } from '@/sanity/lib/student/getStudentByClerkId'
 import { currentUser } from '@clerk/nextjs/server'
 import { Bookmark } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-
 export default async function BookmarksPage() {
 	const user = await currentUser()
 
@@ -29,7 +27,7 @@ export default async function BookmarksPage() {
 					<div className='text-center py-12'>
 						<h2 className='text-2xl font-semibold mb-4'>Account not found</h2>
 						<p className='text-muted-foreground mb-8'>
-							Your student account hasn't been set up properly.
+							Your student account hasn&apos;t been set up properly.
 						</p>
 					</div>
 				</div>
@@ -64,17 +62,22 @@ export default async function BookmarksPage() {
 					</div>
 				) : (
 					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-						{bookmarks.map(bookmark => {
-							if (!bookmark.course) return null
+						{bookmarks.map(
+							(bookmark: {
+								_id: string
+								course: GetCoursesQueryResult[number]
+							}) => {
+								if (!bookmark.course) return null
 
-							return (
-								<CourseCard
-									key={bookmark._id}
-									course={bookmark.course}
-									href={`/courses/${bookmark.course.slug}`}
-								/>
-							)
-						})}
+								return (
+									<CourseCard
+										key={bookmark._id}
+										course={bookmark.course}
+										href={`/courses/${bookmark.course.slug}`}
+									/>
+								)
+							}
+						)}
 					</div>
 				)}
 			</div>

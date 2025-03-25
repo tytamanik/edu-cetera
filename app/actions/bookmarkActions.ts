@@ -1,5 +1,3 @@
-// app/actions/bookmarkActions.ts
-// Create this new file
 'use server'
 
 import { createBookmark } from '@/sanity/lib/bookmarks/createBookmark'
