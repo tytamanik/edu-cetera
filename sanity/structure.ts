@@ -35,6 +35,19 @@ export const structure = (S: StructureBuilder) =>
 			S.divider(),
 
 			S.listItem()
+				.title('Watch Later')
+				.schemaType('watchLater')
+				.child(
+					S.documentTypeList('watchLater')
+						.title('Watch Later Items')
+						.child(watchLaterId =>
+							S.document().schemaType('watchLater').documentId(watchLaterId)
+						)
+				),
+
+			S.divider(),
+
+			S.listItem()
 				.title('User Management')
 				.child(
 					S.list()
@@ -113,6 +126,21 @@ export const structure = (S: StructureBuilder) =>
 																.params({ studentId })
 																.defaultOrdering([
 																	{ field: 'completedAt', direction: 'desc' },
+																])
+														),
+
+													S.listItem()
+														.title('View Watch Later Items')
+														.child(
+															S.documentList()
+																.title('Watch Later Items')
+																.schemaType('watchLater')
+																.filter(
+																	'_type == "watchLater" && student._ref == $studentId'
+																)
+																.params({ studentId })
+																.defaultOrdering([
+																	{ field: 'createdAt', direction: 'desc' },
 																])
 														),
 												])

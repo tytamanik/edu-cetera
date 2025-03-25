@@ -42,9 +42,11 @@ interface SidebarProps {
 
 export function Sidebar({ course, completedLessons = [] }: SidebarProps) {
 	const pathname = usePathname()
-	const { isOpen, toggle, close } = useSidebar()
+	const { sidebarState, toggleSidebar, hideSidebar } = useSidebar()
 	const [isMounted, setIsMounted] = useState(false)
 	const [openModules, setOpenModules] = useState<string[]>([])
+
+	const isOpen = sidebarState === 'expanded'
 
 	useEffect(() => {
 		if (pathname && course?.modules) {
@@ -93,7 +95,7 @@ export function Sidebar({ course, completedLessons = [] }: SidebarProps) {
 						<DarkModeToggle />
 
 						<Button
-							onClick={close}
+							onClick={hideSidebar}
 							variant='ghost'
 							className='lg:hidden -mr-2'
 							size='icon'
@@ -158,7 +160,7 @@ export function Sidebar({ course, completedLessons = [] }: SidebarProps) {
 													key={lesson._id}
 													prefetch={false}
 													href={`/dashboard/courses/${course._id}/lessons/${lesson._id}`}
-													onClick={close}
+													onClick={hideSidebar}
 													className={cn(
 														'flex items-center pl-8 lg:pl-10 pr-2 lg:pr-4 py-2 gap-x-2 lg:gap-x-4 group hover:bg-muted/50 transition-colors relative',
 														isActive && 'bg-muted',
@@ -225,7 +227,7 @@ export function Sidebar({ course, completedLessons = [] }: SidebarProps) {
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<Button
-								onClick={toggle}
+								onClick={toggleSidebar}
 								variant='ghost'
 								size='icon'
 								className='h-10 w-10'
@@ -262,7 +264,7 @@ export function Sidebar({ course, completedLessons = [] }: SidebarProps) {
 			{isOpen && (
 				<div
 					className='fixed inset-0 z-30 bg-background/80 backdrop-blur-sm lg:hidden'
-					onClick={close}
+					onClick={hideSidebar}
 				/>
 			)}
 		</>
