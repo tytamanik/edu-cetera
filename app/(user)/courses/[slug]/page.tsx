@@ -1,3 +1,4 @@
+import { BookmarkButton } from '@/components/BookmarkButton'
 import EnrollButton from '@/components/EnrollButton'
 import getCourseBySlug from '@/sanity/lib/courses/getCourseBySlug'
 import { urlFor } from '@/sanity/lib/image'
@@ -6,7 +7,6 @@ import { auth } from '@clerk/nextjs/server'
 import { ArrowLeft, BookOpen } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-
 interface CoursePageProps {
 	params: Promise<{
 		slug: string
@@ -70,6 +70,11 @@ export default async function CoursePage({ params }: CoursePageProps) {
 								{course.price === 0 ? 'Free' : `$${course.price}`}
 							</div>
 							<EnrollButton courseId={course._id} isEnrolled={isEnrolled} />
+							<BookmarkButton
+								courseId={course._id}
+								variant='outline'
+								className='bg-white/10 hover:bg-white/20 border-none text-white'
+							/>
 						</div>
 					</div>
 				</div>

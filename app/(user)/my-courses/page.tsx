@@ -1,3 +1,6 @@
+// app/(user)/my-courses/page.tsx
+// Update this file to fix the duplicate key issue
+
 import { CourseCard } from '@/components/CourseCard'
 import { getCourseProgress } from '@/sanity/lib/lessons/getCourseProgress'
 import { getEnrolledCourses } from '@/sanity/lib/student/getEnrolledCourses'
@@ -16,12 +19,14 @@ export default async function MyCoursesPage() {
 	const enrolledCourses = await getEnrolledCourses(user.id)
 
 	const coursesWithProgress = await Promise.all(
-		enrolledCourses.map(async ({ course }) => {
+		enrolledCourses.map(async ({ course, _id }) => {
 			if (!course) return null
 			const progress = await getCourseProgress(user.id, course._id)
 			return {
 				course,
 				progress: progress.courseProgress,
+				// Use the enrollment ID as the key
+				enrollmentId: _id,
 			}
 		})
 	)
@@ -56,7 +61,8 @@ export default async function MyCoursesPage() {
 
 							return (
 								<CourseCard
-									key={item.course._id}
+									// Use enrollmentId instead of course._id to ensure uniqueness
+									key={item.enrollmentId || `enrollment-${item.course._id}`}
 									course={item.course}
 									progress={item.progress}
 									href={`/dashboard/courses/${item.course._id}`}

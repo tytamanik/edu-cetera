@@ -1,33 +1,87 @@
-"use client";
+// components/SearchInput.tsx
+// Replace this file with the following code
+'use client'
 
-import { Search } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { Mic, Search, X } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { Button } from './ui/button'
 
-export function SearchInput() {
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
+interface SearchInputProps {
+	onFocus?: () => void
+	onBlur?: () => void
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search/${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
+export function SearchInput({ onFocus, onBlur }: SearchInputProps) {
+	const router = useRouter()
+	const [searchQuery, setSearchQuery] = useState('')
+	const [isFocused, setIsFocused] = useState(false)
 
-  return (
-    <form
-      onSubmit={handleSubmit}
-      className="relative w-full flex-1 max-w-[300px]"
-    >
-      <input
-        type="text"
-        placeholder="Search courses..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full rounded-full bg-secondary/80 px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-      />
-      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-    </form>
-  );
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault()
+		if (searchQuery.trim()) {
+			router.push(`/search/${encodeURIComponent(searchQuery.trim())}`)
+		}
+	}
+
+	const handleFocus = () => {
+		setIsFocused(true)
+		onFocus?.()
+	}
+
+	const handleBlur = () => {
+		setIsFocused(false)
+		onBlur?.()
+	}
+
+	const clearSearch = () => {
+		setSearchQuery('')
+	}
+
+	return (
+		<form onSubmit={handleSubmit} className='flex w-full max-w-[600px] mx-auto'>
+			<div
+				className={`flex items-center w-full relative rounded-l-full border ${isFocused ? 'border-blue-500' : 'border-input'} overflow-hidden`}
+			>
+				{isFocused && (
+					<div className='pl-4'>
+						<Search className='h-4 w-4 text-muted-foreground' />
+					</div>
+				)}
+				<input
+					type='text'
+					placeholder='Search courses...'
+					value={searchQuery}
+					onChange={e => setSearchQuery(e.target.value)}
+					onFocus={handleFocus}
+					onBlur={handleBlur}
+					className='w-full py-2 px-4 bg-background focus:outline-none text-sm'
+				/>
+				{searchQuery && (
+					<button
+						type='button'
+						onClick={clearSearch}
+						className='absolute right-2 text-muted-foreground hover:text-foreground'
+					>
+						<X className='h-4 w-4' />
+					</button>
+				)}
+			</div>
+			<Button
+				type='submit'
+				variant='secondary'
+				className='rounded-r-full px-4 py-2 h-auto border border-l-0 border-input'
+			>
+				<Search className='h-4 w-4' />
+			</Button>
+			<Button
+				type='button'
+				variant='ghost'
+				size='icon'
+				className='ml-2 rounded-full'
+			>
+				<Mic className='h-4 w-4' />
+			</Button>
+		</form>
+	)
 }

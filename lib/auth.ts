@@ -1,7 +1,7 @@
 import getCourseById from '@/sanity/lib/courses/getCourseById'
 import { getStudentByClerkId } from '@/sanity/lib/student/getStudentByClerkId'
 import { isEnrolledInCourse } from '@/sanity/lib/student/isEnrolledInCourse'
-//trigger redeploy
+
 interface AuthResult {
 	isAuthorized: boolean
 	redirect?: string
