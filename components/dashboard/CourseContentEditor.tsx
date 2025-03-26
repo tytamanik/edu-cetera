@@ -1,3 +1,4 @@
+// File: components/dashboard/CourseContentEditor.tsx
 'use client'
 
 import { updateCourseCurriculumAction } from '@/app/actions/courseActions'
@@ -50,12 +51,21 @@ export default function CourseContentEditor({
 	const [isPending, startTransition] = useTransition()
 	const [error, setError] = useState<string | null>(null)
 
+	const generateKey = (prefix: string, existingKey?: string, id?: string) => {
+		return (
+			existingKey ||
+			`${prefix}-${id || Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+		)
+	}
+
 	const [modules, setModules] = useState<Module[]>(
 		initialCurriculum.modules.map(module => ({
 			...module,
-			_key:
-				module._id ||
-				`new-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+			_key: generateKey('module', module._key, module._id),
+			lessons: module.lessons.map(lesson => ({
+				...lesson,
+				_key: generateKey('lesson', lesson._key, lesson._id),
+			})),
 		}))
 	)
 
@@ -65,7 +75,7 @@ export default function CourseContentEditor({
 
 	const addModule = () => {
 		const newModule: Module = {
-			_key: `new-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+			_key: generateKey('module'),
 			title: 'New Module',
 			lessons: [],
 			isNew: true,

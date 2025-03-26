@@ -260,29 +260,6 @@ export default function CourseForm({
 							</p>
 						</div>
 					</div>
-
-					{courseId && (
-						<div className='border rounded-lg p-4 mt-6 bg-muted/10'>
-							<div className='flex items-center justify-between'>
-								<div>
-									<h3 className='font-medium'>Course Preview</h3>
-									<p className='text-sm text-muted-foreground'>
-										Preview how your course will appear to students
-									</p>
-								</div>
-								{initialData?.slug?.current && (
-									<Button variant='outline' size='sm' asChild>
-										<Link
-											href={`/courses/${initialData.slug.current}`}
-											target='_blank'
-										>
-											Preview Course
-										</Link>
-									</Button>
-								)}
-							</div>
-						</div>
-					)}
 				</TabsContent>
 
 				<TabsContent value='content' className='space-y-4'>

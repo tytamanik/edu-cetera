@@ -454,132 +454,112 @@ export async function uploadCourseImageAction(formData: FormData) {
 		}
 	}
 }
+// Update the key generation logic in the updateCourseCurriculumAction
 export async function updateCourseCurriculumAction(data: CurriculumData) {
 	try {
 		const { courseId, modules } = data
 
-		for (const courseModule of modules) {
-			let moduleId = courseModule._id
+		const processedModules = await Promise.all(
+			modules.map(async (courseModule, moduleIndex) => {
+				let moduleId = courseModule._id
 
-			if (courseModule.isNew || !moduleId) {
-				const newModule = await client.create({
-					_type: 'module',
-					title: courseModule.title,
-				})
+				// Ensure consistent key generation
+				const moduleKey =
+					courseModule._key || `module-${moduleId || moduleIndex}-${Date.now()}`
 
-				moduleId = newModule._id
-			} else {
-				await client
-					.patch(moduleId)
-					.set({
+				if (courseModule.isNew || !moduleId) {
+					const newModule = await client.create({
+						_type: 'module',
 						title: courseModule.title,
 					})
-					.commit()
-			}
 
-			const lessonRefs = []
-
-			for (const lesson of courseModule.lessons) {
-				let lessonId = lesson._id
-
-				if (lesson.isNew || !lessonId) {
-					const newLesson = await client.create({
-						_type: 'lesson',
-						title: lesson.title,
-						slug: {
-							_type: 'slug',
-							current: lesson.slug?.current || '',
-						},
-						description: lesson.description || '',
-						videoUrl: lesson.videoUrl || '',
-						loomUrl: lesson.loomUrl || '',
-						content: lesson.content || [],
-					})
-
-					lessonId = newLesson._id
+					moduleId = newModule._id
 				} else {
 					await client
-						.patch(lessonId)
+						.patch(moduleId)
 						.set({
-							title: lesson.title,
-							slug: {
-								_type: 'slug',
-								current: lesson.slug?.current || '',
-							},
-							description: lesson.description || '',
-							videoUrl: lesson.videoUrl || '',
-							loomUrl: lesson.loomUrl || '',
-							content: lesson.content || [],
+							title: courseModule.title,
 						})
 						.commit()
 				}
 
-				lessonRefs.push({
-					_key: lesson._key || lessonId,
-					_type: 'reference',
-					_ref: lessonId,
-				})
-			}
+				const processedLessons = await Promise.all(
+					courseModule.lessons.map(async (lesson, lessonIndex) => {
+						// Ensure consistent key generation for lessons
+						const lessonKey =
+							lesson._key || `lesson-${lesson._id || lessonIndex}-${Date.now()}`
 
-			await client
-				.patch(moduleId)
-				.set({
-					lessons: lessonRefs,
-				})
-				.commit()
+						let lessonId = lesson._id
 
-			await client
-				.patch(courseId)
-				.setIfMissing({
-					modules: [],
-				})
-				.append('modules', [
-					{
-						_key: courseModule._key || moduleId,
-						_type: 'reference',
-						_ref: moduleId,
-					},
-				])
-				.commit()
-		}
+						if (lesson.isNew || !lessonId) {
+							const newLesson = await client.create({
+								_type: 'lesson',
+								title: lesson.title,
+								slug: {
+									_type: 'slug',
+									current:
+										lesson.slug?.current ||
+										lesson.title.toLowerCase().replace(/\s+/g, '-'),
+								},
+								description: lesson.description || '',
+								videoUrl: lesson.videoUrl || '',
+								loomUrl: lesson.loomUrl || '',
+								content: lesson.content || [],
+							})
 
-		const currentCourse = await client.fetch(
-			`*[_type == "course" && _id == $courseId][0] {
-        modules[]->._id
-      }`,
-			{ courseId }
-		)
+							lessonId = newLesson._id
+						} else {
+							await client
+								.patch(lessonId)
+								.set({
+									title: lesson.title,
+									slug: {
+										_type: 'slug',
+										current:
+											lesson.slug?.current ||
+											lesson.title.toLowerCase().replace(/\s+/g, '-'),
+									},
+									description: lesson.description || '',
+									videoUrl: lesson.videoUrl || '',
+									loomUrl: lesson.loomUrl || '',
+									content: lesson.content || [],
+								})
+								.commit()
+						}
 
-		if (currentCourse?.modules) {
-			const currentModuleIds = currentCourse.modules.map(
-				(m: { _id: string }) => m._id
-			)
-			const newModuleIds = modules.filter(m => m._id).map(m => m._id)
-
-			const modulesToRemove = currentModuleIds.filter(
-				(id: string) => !newModuleIds.includes(id)
-			)
-
-			if (modulesToRemove.length > 0) {
-				const currentModulesArray = await client.fetch(
-					`*[_type == "course" && _id == $courseId][0].modules`,
-					{ courseId }
+						return {
+							_key: lessonKey,
+							_type: 'reference',
+							_ref: lessonId,
+						}
+					})
 				)
 
-				const updatedModules = currentModulesArray.filter(
-					(moduleRef: { _ref: string }) =>
-						!modulesToRemove.includes(moduleRef._ref)
-				)
-
+				// Attach lessons to the module
 				await client
-					.patch(courseId)
+					.patch(moduleId)
 					.set({
-						modules: updatedModules,
+						lessons: processedLessons,
 					})
 					.commit()
-			}
-		}
 
+				return {
+					_key: moduleKey,
+					_type: 'reference',
+					_ref: moduleId,
+				}
+			})
+		)
+
+		// Update course modules
+		await client
+			.patch(courseId)
+			.set({
+				modules: processedModules,
+			})
+			.commit()
+
+		// Revalidate paths
 		revalidatePath(`/creator-dashboard/courses/${courseId}/content`)
 		revalidatePath(`/creator-dashboard/courses/${courseId}/edit`)
 		revalidatePath(`/creator-dashboard`)
