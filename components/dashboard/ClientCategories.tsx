@@ -10,7 +10,6 @@ interface Category {
 	name: string
 	slug: string
 	color?: string
-	icon?: string
 }
 
 interface ClientCategoriesProps {
@@ -42,7 +41,6 @@ export default function ClientCategories({
 							name: category.name,
 							slug: category.slug,
 							color: category.color,
-							icon: category.icon,
 						}))
 
 						setCategories(fetchedCategories)
