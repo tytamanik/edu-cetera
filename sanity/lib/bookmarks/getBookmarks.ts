@@ -1,5 +1,3 @@
-// sanity/lib/bookmarks/getBookmarks.ts
-// Create this new file
 import { defineQuery } from 'groq'
 import { sanityFetch } from '../live'
 

@@ -1,6 +1,3 @@
-// sanity/schemaTypes/studentType.tsx
-// Update this file to add isInstructor field and instructor reference
-
 import Image from 'next/image'
 import { defineField, defineType } from 'sanity'
 
@@ -36,14 +33,14 @@ export const studentType = defineType({
 			title: 'Profile Image URL',
 			type: 'url',
 		}),
-		// Add isInstructor field
+
 		defineField({
 			name: 'isInstructor',
 			title: 'Is Instructor',
 			type: 'boolean',
 			initialValue: false,
 		}),
-		// Add reference to instructor document
+
 		defineField({
 			name: 'instructor',
 			title: 'Instructor Profile',

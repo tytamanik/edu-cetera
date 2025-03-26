@@ -1,7 +1,6 @@
-// app/(creator)/creator-dashboard/courses/[courseId]/content/page.tsx
-// Course content editor page
-
+import CourseContentEditor from '@/components/dashboard/CourseContentEditor'
 import { Button } from '@/components/ui/button'
+import { getCourseCurriculum } from '@/sanity/lib/courses/getCourseCurriculum'
 import { getCourseForEditing } from '@/sanity/lib/courses/getCourseForEditing'
 import { currentUser } from '@clerk/nextjs/server'
 import { ArrowLeft } from 'lucide-react'
@@ -27,6 +26,7 @@ export default async function CourseContentPage({
 
 	try {
 		const course = await getCourseForEditing(courseId, user.id)
+		const curriculum = await getCourseCurriculum(courseId)
 
 		return (
 			<div className='container mx-auto px-4 py-8 mt-16'>
@@ -46,19 +46,10 @@ export default async function CourseContentPage({
 						Course Content: {course.title}
 					</h1>
 
-					<div className='bg-card border rounded-lg p-8 text-center'>
-						<h2 className='text-xl font-semibold mb-3'>
-							Content Editor Coming Soon
-						</h2>
-						<p className='text-muted-foreground mb-6'>
-							This is where you'll be able to add modules and lessons to your
-							course.
-						</p>
-						<p className='text-sm text-muted-foreground'>
-							For now, please use the main dashboard to manage your course
-							details.
-						</p>
-					</div>
+					<CourseContentEditor
+						courseId={courseId}
+						initialCurriculum={curriculum}
+					/>
 				</div>
 			</div>
 		)

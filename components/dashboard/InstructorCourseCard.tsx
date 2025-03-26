@@ -1,6 +1,3 @@
-// components/dashboard/InstructorCourseCard.tsx
-// Course card component for the instructor dashboard
-
 'use client'
 
 import { Badge } from '@/components/ui/badge'

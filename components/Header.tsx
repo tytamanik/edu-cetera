@@ -1,6 +1,3 @@
-// components/Header.tsx
-// Update with error handling
-
 'use client'
 
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
@@ -14,7 +11,6 @@ import { SearchInput } from './SearchInput'
 import { Button } from './ui/button'
 
 export default function Header() {
-	// Local fallback toggle function in case the context is not available
 	const [sidebarVisible, setSidebarVisible] = useState(false)
 	let toggleSidebar = () => setSidebarVisible(!sidebarVisible)
 
@@ -23,7 +19,6 @@ export default function Header() {
 		toggleSidebar = sidebarContext.toggleSidebar
 	} catch (error) {
 		console.error('Error using SidebarProvider:', error)
-		// Continue with local toggle if context is not available
 	}
 
 	return (
@@ -46,7 +41,7 @@ export default function Header() {
 					>
 						<BookOpen className='h-6 w-6 text-primary' />
 						<span className='text-xl font-bold bg-gradient-to-r from-primary/90 to-primary bg-clip-text text-transparent'>
-							Edu Cetera
+							Ed Cetera
 						</span>
 					</Link>
 				</div>

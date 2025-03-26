@@ -1,6 +1,3 @@
-// components/BecomeInstructor.tsx
-// Add this component to allow users to become instructors
-
 'use client'
 
 import {
@@ -60,12 +57,10 @@ export default function BecomeInstructor() {
 				setOpen(false)
 				router.refresh()
 
-				// Navigate to creator dashboard after successful conversion
 				setTimeout(() => {
 					router.push('/creator-dashboard')
 				}, 500)
 			} else {
-				// Handle error
 				console.error('Failed to become instructor:', result.error)
 			}
 		})

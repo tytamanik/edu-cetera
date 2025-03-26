@@ -1,6 +1,3 @@
-// components/dashboard/CourseForm.tsx
-// Course form for creating and editing courses
-
 'use client'
 
 import { updateCourseAction } from '@/app/actions/courseActions'
@@ -73,7 +70,6 @@ export default function CourseForm({
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 
-		// Basic validation
 		const newErrors: Record<string, string> = {}
 
 		if (!formState.title) newErrors.title = 'Title is required'
@@ -87,7 +83,6 @@ export default function CourseForm({
 
 		setErrors({})
 
-		// Create FormData
 		const formData = new FormData()
 		formData.append('courseId', courseId || '')
 		formData.append('title', formState.title)
@@ -100,7 +95,6 @@ export default function CourseForm({
 			formData.append('userId', user.id)
 		}
 
-		// Update course
 		startTransition(async () => {
 			try {
 				const result = await updateCourseAction(formData)

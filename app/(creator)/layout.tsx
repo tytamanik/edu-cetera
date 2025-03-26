@@ -1,6 +1,3 @@
-// app/(creator)/layout.tsx
-// Create this file for the creator layout
-
 import Header from '@/components/Header'
 import { SidebarProvider } from '@/components/providers/sidebar-provider'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -9,7 +6,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-	title: 'Creator Dashboard - Edu Cetera',
+	title: 'Creator Dashboard - Ed Cetera',
 	description: 'Manage your courses and content',
 }
 

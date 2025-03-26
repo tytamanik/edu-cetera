@@ -12,7 +12,6 @@ export async function becomeInstructorAction(
 	try {
 		const name = formData.get('name') as string
 		const bio = formData.get('bio') as string
-		// In a real implementation, you'd handle photo upload here
 
 		if (!name || !bio) {
 			return { success: false, error: 'Name and bio are required' }
@@ -58,17 +57,14 @@ export async function checkInstructorStatusAction(clerkId: string) {
 }
 export async function isUserCourseCreator(courseId: string, clerkId: string) {
 	try {
-		// First, get the instructor ID for this user
 		const instructor = await getInstructorByClerkId(clerkId)
 
 		if (!instructor?.data?._id) {
 			return { isCreator: false }
 		}
 
-		// Check if this instructor is the creator of the course
 		const instructorId = instructor.data._id
 
-		// Check in Sanity if this course belongs to this instructor
 		const query = `*[_type == "course" && _id == $courseId && instructor._ref == $instructorId][0]._id`
 		const result = await client.fetch(query, { courseId, instructorId })
 

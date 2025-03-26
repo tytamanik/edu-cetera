@@ -10,30 +10,27 @@ export async function createInstructorFromUser({
 	clerkId: string
 	name: string
 	bio: string
-	photo?: any // This will be a Sanity image reference
+	photo?: any
 }) {
 	try {
-		// First verify the user exists
 		const student = await getStudentByClerkId(clerkId)
 
 		if (!student?.data?._id) {
 			throw new Error('Student not found')
 		}
 
-		// Create instructor document
 		const instructor = await client.create({
 			_type: 'instructor',
 			name,
 			bio,
 			photo: photo,
-			clerkId, // Add clerkId field to link instructor to user
+			clerkId,
 			studentRef: {
 				_type: 'reference',
 				_ref: student.data._id,
 			},
 		})
 
-		// Update the student document to include the instructor reference
 		await client
 			.patch(student.data._id)
 			.set({

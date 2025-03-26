@@ -1,6 +1,3 @@
-// components/HeaderAction.tsx
-// Add this component to show the creator-related actions in header
-
 'use client'
 
 import { checkInstructorStatusAction } from '@/app/actions/instructorActions'

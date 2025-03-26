@@ -1,5 +1,3 @@
-// components/SearchInput.tsx
-// Replace this file with the following code
 'use client'
 
 import { Mic, Search, X } from 'lucide-react'

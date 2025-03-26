@@ -101,7 +101,6 @@ export function SidebarNav() {
 
 	const sidebarWidth = isCollapsed ? 'w-20' : 'w-64'
 
-	// Navigation items groups
 	const mainNavItems = [
 		{ href: '/', icon: <Home className='h-5 w-5' />, label: 'Home' },
 		{

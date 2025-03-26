@@ -1,6 +1,3 @@
-// app/(creator)/become-instructor/page.tsx
-// Create this file for the become instructor page
-
 import { checkInstructorStatusAction } from '@/app/actions/instructorActions'
 import BecomeInstructorForm from '@/components/BecomeInstructorForm'
 import { currentUser } from '@clerk/nextjs/server'
@@ -13,7 +10,6 @@ export default async function BecomeInstructorPage() {
 		return redirect('/')
 	}
 
-	// Check if already an instructor
 	const { isInstructor } = await checkInstructorStatusAction(user.id)
 
 	if (isInstructor) {

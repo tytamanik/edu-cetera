@@ -1,6 +1,3 @@
-// app/actions/courseActions.ts
-// Server actions for course management with real Sanity integration
-
 'use server'
 
 import { client } from '@/sanity/lib/adminClient'
@@ -10,7 +7,6 @@ import { revalidatePath } from 'next/cache'
 
 export async function createCourseAction(formData: FormData) {
 	try {
-		// Get form data
 		const title = formData.get('title') as string
 		const slug = formData.get('slug') as string
 		const description = formData.get('description') as string
@@ -18,7 +14,6 @@ export async function createCourseAction(formData: FormData) {
 		const price = Number(formData.get('price')) || 0
 		const userId = formData.get('userId') as string
 
-		// Validate required fields
 		if (!title || !slug || !description || !categorySlug) {
 			return { success: false, error: 'Missing required fields' }
 		}
@@ -27,7 +22,6 @@ export async function createCourseAction(formData: FormData) {
 			return { success: false, error: 'User not authenticated' }
 		}
 
-		// Get instructor profile
 		const instructorResult = await getInstructorByClerkId(userId)
 		const instructor = instructorResult.data
 
@@ -39,10 +33,8 @@ export async function createCourseAction(formData: FormData) {
 			}
 		}
 
-		// Get category ID
 		let categoryId = await getCategoryIdBySlug(categorySlug)
 		if (!categoryId) {
-			// Create category if it doesn't exist
 			const newCategory = await client.create({
 				_type: 'category',
 				name: categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1),
@@ -54,7 +46,6 @@ export async function createCourseAction(formData: FormData) {
 			categoryId = newCategory._id
 		}
 
-		// Create course in Sanity
 		const course = await client.create({
 			_type: 'course',
 			title,
@@ -76,7 +67,6 @@ export async function createCourseAction(formData: FormData) {
 			createdAt: new Date().toISOString(),
 		})
 
-		// Revalidate relevant paths
 		revalidatePath('/creator-dashboard')
 		revalidatePath(`/creator-dashboard/courses/${course._id}/edit`)
 		revalidatePath('/courses')
@@ -103,14 +93,12 @@ export async function updateCourseAction(formData: FormData) {
 			return { success: false, error: 'Course ID is required' }
 		}
 
-		// Get form data
 		const title = formData.get('title') as string
 		const description = formData.get('description') as string
 		const categorySlug = formData.get('category') as string
 		const price = Number(formData.get('price')) || 0
 		const published = formData.get('published') === 'true'
 
-		// Create update object
 		const updates: Record<string, any> = {}
 
 		if (title) updates.title = title
@@ -118,7 +106,6 @@ export async function updateCourseAction(formData: FormData) {
 		if (price !== undefined) updates.price = price
 		if (published !== undefined) updates.published = published
 
-		// Update category if provided
 		if (categorySlug) {
 			const categoryId = await getCategoryIdBySlug(categorySlug)
 			if (categoryId) {
@@ -129,10 +116,8 @@ export async function updateCourseAction(formData: FormData) {
 			}
 		}
 
-		// Update course in Sanity
 		await client.patch(courseId).set(updates).commit()
 
-		// Revalidate relevant paths
 		revalidatePath('/creator-dashboard')
 		revalidatePath(`/creator-dashboard/courses/${courseId}/edit`)
 		revalidatePath('/courses')
@@ -150,12 +135,54 @@ export async function updateCourseAction(formData: FormData) {
 	}
 }
 
+export async function publishCourseAction(courseId: string) {
+	try {
+		await client.patch(courseId).set({ published: true }).commit()
+
+		revalidatePath('/creator-dashboard')
+		revalidatePath(`/creator-dashboard/courses/${courseId}/edit`)
+		revalidatePath('/courses')
+
+		return {
+			success: true,
+			message: 'Course published successfully',
+		}
+	} catch (error) {
+		console.error('Error publishing course:', error)
+		return {
+			success: false,
+			error:
+				error instanceof Error ? error.message : 'Failed to publish course',
+		}
+	}
+}
+
+export async function unpublishCourseAction(courseId: string) {
+	try {
+		await client.patch(courseId).set({ published: false }).commit()
+
+		revalidatePath('/creator-dashboard')
+		revalidatePath(`/creator-dashboard/courses/${courseId}/edit`)
+		revalidatePath('/courses')
+
+		return {
+			success: true,
+			message: 'Course unpublished successfully',
+		}
+	} catch (error) {
+		console.error('Error unpublishing course:', error)
+		return {
+			success: false,
+			error:
+				error instanceof Error ? error.message : 'Failed to unpublish course',
+		}
+	}
+}
+
 export async function deleteCourseAction(courseId: string) {
 	try {
-		// Delete course from Sanity
 		await client.delete(courseId)
 
-		// Revalidate relevant paths
 		revalidatePath('/creator-dashboard')
 		revalidatePath('/courses')
 
@@ -168,6 +195,168 @@ export async function deleteCourseAction(courseId: string) {
 		return {
 			success: false,
 			error: error instanceof Error ? error.message : 'Failed to delete course',
+		}
+	}
+}
+
+export async function updateCourseCurriculumAction(data: {
+	courseId: string
+	modules: {
+		_id?: string
+		_key?: string
+		title: string
+		isNew?: boolean
+		lessons: {
+			_id?: string
+			_key?: string
+			title: string
+			slug?: { current: string }
+			description?: string
+			videoUrl?: string
+			loomUrl?: string
+			content?: any[]
+			isNew?: boolean
+		}[]
+	}[]
+}) {
+	try {
+		const { courseId, modules } = data
+
+		for (const module of modules) {
+			let moduleId = module._id
+
+			if (module.isNew || !moduleId) {
+				const newModule = await client.create({
+					_type: 'module',
+					title: module.title,
+				})
+
+				moduleId = newModule._id
+			} else {
+				await client
+					.patch(moduleId)
+					.set({
+						title: module.title,
+					})
+					.commit()
+			}
+
+			const lessonRefs = []
+
+			for (const lesson of module.lessons) {
+				let lessonId = lesson._id
+
+				if (lesson.isNew || !lessonId) {
+					const newLesson = await client.create({
+						_type: 'lesson',
+						title: lesson.title,
+						slug: {
+							_type: 'slug',
+							current: lesson.slug?.current || '',
+						},
+						description: lesson.description || '',
+						videoUrl: lesson.videoUrl || '',
+						loomUrl: lesson.loomUrl || '',
+						content: lesson.content || [],
+					})
+
+					lessonId = newLesson._id
+				} else {
+					await client
+						.patch(lessonId)
+						.set({
+							title: lesson.title,
+							slug: {
+								_type: 'slug',
+								current: lesson.slug?.current || '',
+							},
+							description: lesson.description || '',
+							videoUrl: lesson.videoUrl || '',
+							loomUrl: lesson.loomUrl || '',
+							content: lesson.content || [],
+						})
+						.commit()
+				}
+
+				lessonRefs.push({
+					_key: lesson._key || lessonId,
+					_type: 'reference',
+					_ref: lessonId,
+				})
+			}
+
+			await client
+				.patch(moduleId)
+				.set({
+					lessons: lessonRefs,
+				})
+				.commit()
+
+			await client
+				.patch(courseId)
+				.setIfMissing({
+					modules: [],
+				})
+				.append('modules', [
+					{
+						_key: module._key || moduleId,
+						_type: 'reference',
+						_ref: moduleId,
+					},
+				])
+				.commit()
+		}
+
+		const currentCourse = await client.fetch(
+			`*[_type == "course" && _id == $courseId][0] {
+        modules[]->._id
+      }`,
+			{ courseId }
+		)
+
+		if (currentCourse?.modules) {
+			const currentModuleIds = currentCourse.modules.map((m: any) => m._id)
+			const newModuleIds = modules.filter(m => m._id).map(m => m._id)
+
+			const modulesToRemove = currentModuleIds.filter(
+				(id: string) => !newModuleIds.includes(id)
+			)
+
+			if (modulesToRemove.length > 0) {
+				const currentModulesArray = await client.fetch(
+					`*[_type == "course" && _id == $courseId][0].modules`,
+					{ courseId }
+				)
+
+				const updatedModules = currentModulesArray.filter(
+					(moduleRef: any) => !modulesToRemove.includes(moduleRef._ref)
+				)
+
+				await client
+					.patch(courseId)
+					.set({
+						modules: updatedModules,
+					})
+					.commit()
+			}
+		}
+
+		revalidatePath(`/creator-dashboard/courses/${courseId}/content`)
+		revalidatePath(`/creator-dashboard/courses/${courseId}/edit`)
+		revalidatePath(`/creator-dashboard`)
+
+		return {
+			success: true,
+			message: 'Course curriculum updated successfully',
+		}
+	} catch (error) {
+		console.error('Error updating course curriculum:', error)
+		return {
+			success: false,
+			error:
+				error instanceof Error
+					? error.message
+					: 'Failed to update course curriculum',
 		}
 	}
 }

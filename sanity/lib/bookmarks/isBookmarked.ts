@@ -1,5 +1,3 @@
-// sanity/lib/bookmarks/isBookmarked.ts
-// Create this new file
 import groq from 'groq'
 import { sanityFetch } from '../live'
 

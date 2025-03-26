@@ -1,6 +1,3 @@
-// sanity/schemaTypes/instructorType.ts
-// Update this file to include clerkId and reference to student
-
 import { defineField, defineType } from 'sanity'
 
 export const instructorType = defineType({
@@ -24,14 +21,14 @@ export const instructorType = defineType({
 			title: 'Photo',
 			type: 'image',
 		}),
-		// Add clerkId field to link instructor to user
+
 		defineField({
 			name: 'clerkId',
 			title: 'Clerk ID',
 			type: 'string',
 			validation: rule => rule.required(),
 		}),
-		// Add reference to student document
+
 		defineField({
 			name: 'studentRef',
 			title: 'Student Reference',

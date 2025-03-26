@@ -1,5 +1,3 @@
-// app/(user)/page.tsx
-// Small update
 import { CourseCard } from '@/components/CourseCard'
 import { getCourses } from '@/sanity/lib/courses/getCourses'
 

@@ -12,14 +12,12 @@ export default async function CreatorDashboardPage() {
 		return redirect('/')
 	}
 
-	// Define an interface for the instructor profile response
 	interface InstructorProfileResponse {
 		success: boolean
 		instructor: {
 			_id?: string
 			name?: string
 			courses?: Course[]
-			// Add other properties as needed
 		} | null
 		error?: string
 	}
@@ -29,21 +27,17 @@ export default async function CreatorDashboardPage() {
 	)) as InstructorProfileResponse
 
 	if (!success || !instructor) {
-		// If the user is not an instructor, redirect to the become an instructor page
 		return redirect('/become-instructor')
 	}
 
 	const { courses = [] } = instructor
 
-	// Define an interface for the course type
 	interface Course {
 		_id: string
 		title?: string
 		published?: boolean
-		// Add other course properties you need
 	}
 
-	// Calculate some simple stats for the dashboard
 	const totalCourses = courses.length
 	const publishedCourses = courses.filter(
 		(course: Course) => course.published
@@ -62,11 +56,10 @@ export default async function CreatorDashboardPage() {
 						</p>
 					</div>
 				</div>
-				{/* We'll temporarily comment out the CreateCourseButton until we implement it */}
-				{/* <CreateCourseButton /> */}
+
+				{/* TODO: <CreateCourseButton /> */}
 			</div>
 
-			{/* Stats Cards */}
 			<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8'>
 				<div className='bg-card rounded-lg shadow p-6 border'>
 					<div className='flex items-center gap-4'>
@@ -105,7 +98,6 @@ export default async function CreatorDashboardPage() {
 				</div>
 			</div>
 
-			{/* Courses Section */}
 			<div className='space-y-6'>
 				<div className='flex items-center justify-between'>
 					<h2 className='text-xl font-bold'>Your Courses</h2>

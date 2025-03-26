@@ -1,6 +1,3 @@
-// sanity/schemaTypes/courseType.ts
-// Update this file to add published field and createdAt field
-
 import { defineField, defineType } from 'sanity'
 
 export const courseType = defineType({
@@ -60,7 +57,7 @@ export const courseType = defineType({
 			type: 'reference',
 			to: { type: 'instructor' },
 		}),
-		// Add published field to control visibility
+
 		defineField({
 			name: 'published',
 			title: 'Published',
@@ -68,7 +65,7 @@ export const courseType = defineType({
 			description: 'Controls if the course is visible to students',
 			initialValue: false,
 		}),
-		// Add createdAt field for sorting and filtering
+
 		defineField({
 			name: 'createdAt',
 			title: 'Created At',

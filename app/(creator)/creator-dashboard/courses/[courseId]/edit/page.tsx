@@ -1,6 +1,3 @@
-// app/(creator)/creator-dashboard/courses/[courseId]/edit/page.tsx
-// Edit course page
-
 import CourseForm from '@/components/dashboard/CourseForm'
 import { Button } from '@/components/ui/button'
 import { getCourseForEditing } from '@/sanity/lib/courses/getCourseForEditing'

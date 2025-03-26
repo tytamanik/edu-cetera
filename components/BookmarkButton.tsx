@@ -1,5 +1,3 @@
-// components/BookmarkButton.tsx
-// Create this new file
 'use client'
 
 import {
@@ -56,7 +54,6 @@ export function BookmarkButton({
 
 	const handleToggleBookmark = () => {
 		if (!user?.id) {
-			// If not logged in, redirect to sign in
 			return
 		}
 

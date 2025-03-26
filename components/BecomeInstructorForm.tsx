@@ -1,6 +1,3 @@
-// components/BecomeInstructorForm.tsx
-// Create this component for the become instructor page
-
 'use client'
 
 import { becomeInstructorAction } from '@/app/actions/instructorActions'
@@ -29,7 +26,6 @@ export default function BecomeInstructorForm({
 		e.preventDefault()
 		const formData = new FormData(e.currentTarget)
 
-		// Validate form
 		const name = formData.get('name') as string
 		const bio = formData.get('bio') as string
 

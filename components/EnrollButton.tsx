@@ -1,6 +1,3 @@
-// components/EnrollButton.tsx
-// Update this file to check if the user is the course creator
-
 'use client'
 
 import { createStripeCheckout } from '@/actions/createStripeCheckout'
@@ -27,7 +24,7 @@ function EnrollButton({
 	useEffect(() => {
 		if (isUserLoaded && user?.id) {
 			setIsChecking(true)
-			// Check if the user is the creator of this course
+
 			startTransition(async () => {
 				try {
 					const result = await isUserCourseCreator(courseId, user.id)

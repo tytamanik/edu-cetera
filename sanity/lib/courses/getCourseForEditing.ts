@@ -1,12 +1,8 @@
-// sanity/lib/courses/getCourseForEditing.ts
-// Function to fetch a course for editing
-
 import { defineQuery } from 'groq'
 import { getInstructorByClerkId } from '../instructor/getInstructorByClerkId'
 import { sanityFetch } from '../live'
 
 export async function getCourseForEditing(courseId: string, clerkId: string) {
-	// First check if the user is the instructor of this course
 	const instructor = await getInstructorByClerkId(clerkId)
 
 	if (!instructor?.data?._id) {

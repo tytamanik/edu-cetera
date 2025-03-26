@@ -1,6 +1,3 @@
-// sanity/lib/categories/getCategoryIdBySlug.ts
-// Get category ID by slug
-
 import groq from 'groq'
 import { client } from '../adminClient'
 

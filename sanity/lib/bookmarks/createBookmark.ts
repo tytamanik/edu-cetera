@@ -1,5 +1,3 @@
-// sanity/lib/bookmarks/createBookmark.ts
-// Create this new file
 import { client } from '../adminClient'
 
 export async function createBookmark(studentId: string, courseId: string) {
