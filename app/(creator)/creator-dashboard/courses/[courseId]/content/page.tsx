@@ -48,8 +48,8 @@ export default async function CourseContentPage({
 							Content Editor Coming Soon
 						</h2>
 						<p className='text-muted-foreground mb-6'>
-							This is where you'll be able to add modules and lessons to your
-							course.
+							This is where you&apos;ll be able to add modules and lessons to
+							your course.
 						</p>
 						<p className='text-sm text-muted-foreground'>
 							For now, please use the main dashboard to manage your course
