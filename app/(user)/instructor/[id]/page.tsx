@@ -10,15 +10,12 @@ import { ArrowLeft, BookOpen, GraduationCap } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-interface InstructorProfilePageProps {
-	params: {
-		id: string
-	}
-}
 
 export default async function InstructorProfilePage({
 	params,
-}: InstructorProfilePageProps) {
+}: {
+	params: { id: string }
+}) {
 	const { id } = params
 	const user = await currentUser()
 
