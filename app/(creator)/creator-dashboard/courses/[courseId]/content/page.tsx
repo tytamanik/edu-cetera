@@ -1,5 +1,6 @@
+// Insert this file at app/(creator)/creator-dashboard/courses/[courseId]/content/page.tsx
 import { currentUser } from '@clerk/nextjs/server'
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
 import CourseContentEditor from '@/components/dashboard/CourseContentEditor'
@@ -9,33 +10,31 @@ import { getCourseForEditing } from '@/sanity/lib/courses/getCourseForEditing'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
-export interface Params {
-	params: {
-		courseId: string
-	}
-}
-
-export interface PageProps extends Params {
+type CourseContentPageProps = {
+	params: { courseId: Promise<string> | string }
 	searchParams?: { [key: string]: string | string[] | undefined }
 }
 
-export async function generateMetadata({ params }: Params): Promise<Metadata> {
-	return {
-		title: `Edit Course Content: ${params.courseId}`,
-	}
-}
+export default async function CourseContentPage({
+	params,
+}: CourseContentPageProps) {
+	// Resolve courseId if it's a Promise
+	const courseId =
+		typeof params.courseId === 'string'
+			? params.courseId
+			: await params.courseId
 
-export default async function CourseContentPage({ params }: PageProps) {
+	// Authenticate user
 	const user = await currentUser()
 	if (!user?.id) {
 		return redirect('/')
 	}
 
-	const { courseId } = params
-
 	try {
+		// Fetch course and validate instructor access
 		const course = await getCourseForEditing(courseId, user.id)
 
+		// Fetch curriculum with fallback
 		const curriculum = await getCourseCurriculum(courseId)
 
 		return (
@@ -73,4 +72,20 @@ export default async function CourseContentPage({ params }: PageProps) {
 	}
 }
 
+export async function generateMetadata({
+	params,
+}: {
+	params: { courseId: Promise<string> | string }
+}): Promise<Metadata> {
+	const courseId =
+		typeof params.courseId === 'string'
+			? params.courseId
+			: await params.courseId
+
+	return {
+		title: `Edit Course Content: ${courseId}`,
+	}
+}
+
+// Prevent static generation for this dynamic page
 export const dynamic = 'force-dynamic'
