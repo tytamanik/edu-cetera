@@ -1,5 +1,7 @@
+// File: app/(user)/courses/[slug]/page.tsx
 import { BookmarkButton } from '@/components/BookmarkButton'
 import EnrollButton from '@/components/EnrollButton'
+import { GetCourseBySlugQueryResult } from '@/sanity.types'
 import getCourseBySlug from '@/sanity/lib/courses/getCourseBySlug'
 import { urlFor } from '@/sanity/lib/image'
 import { isEnrolledInCourse } from '@/sanity/lib/student/isEnrolledInCourse'
@@ -7,6 +9,7 @@ import { auth } from '@clerk/nextjs/server'
 import { ArrowLeft, BookOpen } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+
 interface CoursePageProps {
 	params: Promise<{
 		slug: string
@@ -15,7 +18,7 @@ interface CoursePageProps {
 
 export default async function CoursePage({ params }: CoursePageProps) {
 	const { slug } = await params
-	const course = await getCourseBySlug(slug)
+	const course = (await getCourseBySlug(slug)) as GetCourseBySlugQueryResult
 	const { userId } = await auth()
 
 	const isEnrolled =

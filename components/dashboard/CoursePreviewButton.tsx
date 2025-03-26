@@ -22,7 +22,6 @@ export default function CoursePreviewButton({
 	const [hasSlug, setHasSlug] = useState<boolean>(false)
 
 	useEffect(() => {
-		// Check if slug exists and is not empty
 		setHasSlug(!!slug && slug.trim() !== '')
 	}, [slug])
 

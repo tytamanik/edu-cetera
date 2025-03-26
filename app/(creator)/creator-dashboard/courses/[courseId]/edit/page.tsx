@@ -3,7 +3,7 @@ import CourseForm from '@/components/dashboard/CourseForm'
 import CoursePreviewButton from '@/components/dashboard/CoursePreviewButton'
 import DeleteCourseButton from '@/components/dashboard/DeleteCourseButton'
 import { Button } from '@/components/ui/button'
-import { getCategories } from '@/sanity/lib/categories/getCategories'
+import { Category } from '@/sanity/lib/categories/getCategories'
 import { getCourseForEditing } from '@/sanity/lib/courses/getCourseForEditing'
 import { currentUser } from '@clerk/nextjs/server'
 import { ArrowLeft } from 'lucide-react'
@@ -28,10 +28,12 @@ export default async function CourseEditPage({ params }: CourseEditPageProps) {
 	try {
 		const [course, categoriesData] = await Promise.all([
 			getCourseForEditing(courseId, user.id),
-			getCategories(),
+			import('@/sanity/lib/categories/getCategories').then(module =>
+				module.getCategories()
+			),
 		])
 
-		const categories = categoriesData.map((category: any) => ({
+		const categories = categoriesData.map((category: Category) => ({
 			_id: category._id,
 			name: category.name,
 			slug: category.slug,

@@ -74,7 +74,6 @@ export default function CreateCourseButton({
 		const description = formData.get('description') as string
 		const price = formData.get('price') as string
 
-		// Add the selected category to the form data
 		formData.set('category', selectedCategory)
 
 		if (!title) newErrors.title = 'Title is required'

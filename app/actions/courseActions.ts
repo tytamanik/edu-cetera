@@ -25,7 +25,6 @@ export async function createCourseAction(formData: FormData) {
 			return { success: false, error: 'User not authenticated' }
 		}
 
-		// Check if user is an instructor
 		const isInstructor = await isUserInstructor(userId)
 		if (!isInstructor) {
 			return {
@@ -111,7 +110,6 @@ export async function updateCourseAction(formData: FormData) {
 			return { success: false, error: 'User not authenticated' }
 		}
 
-		// Check if this is user's course
 		const instructorResult = await getInstructorByClerkId(userId)
 		const instructor = instructorResult.data
 
@@ -119,7 +117,6 @@ export async function updateCourseAction(formData: FormData) {
 			return { success: false, error: 'Instructor profile not found' }
 		}
 
-		// Check if course exists and belongs to this instructor
 		const courseExists = await client.fetch(
 			`*[_type == "course" && _id == $courseId && instructor._ref == $instructorId][0]._id`,
 			{ courseId, instructorId: instructor._id }
@@ -185,7 +182,6 @@ export async function publishCourseAction(courseId: string, userId: string) {
 
 		const instructorId = instructorResult.data._id
 
-		// Verify course belongs to instructor
 		const courseExists = await client.fetch(
 			`*[_type == "course" && _id == $courseId && instructor._ref == $instructorId][0]._id`,
 			{ courseId, instructorId }
@@ -228,7 +224,6 @@ export async function unpublishCourseAction(courseId: string, userId: string) {
 
 		const instructorId = instructorResult.data._id
 
-		// Verify course belongs to instructor
 		const courseExists = await client.fetch(
 			`*[_type == "course" && _id == $courseId && instructor._ref == $instructorId][0]._id`,
 			{ courseId, instructorId }
@@ -263,7 +258,6 @@ export async function unpublishCourseAction(courseId: string, userId: string) {
 
 export async function deleteCourseAction(courseId: string, userId: string) {
 	try {
-		// Verify the user is an instructor
 		const instructorResult = await getInstructorByClerkId(userId)
 
 		if (!instructorResult?.data?._id) {
@@ -272,7 +266,6 @@ export async function deleteCourseAction(courseId: string, userId: string) {
 
 		const instructorId = instructorResult.data._id
 
-		// Verify course belongs to instructor
 		const courseExists = await client.fetch(
 			`*[_type == "course" && _id == $courseId && instructor._ref == $instructorId][0]._id`,
 			{ courseId, instructorId }
@@ -285,7 +278,6 @@ export async function deleteCourseAction(courseId: string, userId: string) {
 			}
 		}
 
-		// Get all modules to delete them too
 		const modules = await client.fetch(
 			`*[_type == "course" && _id == $courseId][0].modules[]._ref`,
 			{ courseId }
@@ -300,7 +292,6 @@ export async function deleteCourseAction(courseId: string, userId: string) {
 
 				if (lessons && lessons.length > 0) {
 					for (const lessonId of lessons) {
-						// Delete lesson completions
 						const completionIds = await client.fetch(
 							`*[_type == "lessonCompletion" && lesson._ref == $lessonId]._id`,
 							{ lessonId }
@@ -308,17 +299,15 @@ export async function deleteCourseAction(courseId: string, userId: string) {
 						for (const id of completionIds) {
 							await client.delete(id)
 						}
-						// Delete the lesson
+
 						await client.delete(lessonId)
 					}
 				}
 
-				// Delete the module
 				await client.delete(moduleId)
 			}
 		}
 
-		// Delete enrollments
 		const enrollmentIds = await client.fetch(
 			`*[_type == "enrollment" && course._ref == $courseId]._id`,
 			{ courseId }
@@ -327,7 +316,6 @@ export async function deleteCourseAction(courseId: string, userId: string) {
 			await client.delete(id)
 		}
 
-		// Delete bookmarks
 		const bookmarkIds = await client.fetch(
 			`*[_type == "bookmark" && course._ref == $courseId]._id`,
 			{ courseId }
@@ -336,10 +324,8 @@ export async function deleteCourseAction(courseId: string, userId: string) {
 			await client.delete(id)
 		}
 
-		// Finally delete the course itself
 		await client.delete(courseId)
 
-		// Revalidate necessary paths
 		revalidatePath('/creator-dashboard')
 		revalidatePath('/courses')
 		revalidatePath('/my-courses')
@@ -391,10 +377,8 @@ export async function uploadCourseImageAction(formData: FormData) {
 			return { success: false, error: 'Missing image or course ID' }
 		}
 
-		// Get the user from Clerk authentication
 		const { userId } = await auth()
 
-		// If no authenticated user, return an error
 		if (!userId) {
 			return { success: false, error: 'User authentication required' }
 		}
@@ -406,7 +390,6 @@ export async function uploadCourseImageAction(formData: FormData) {
 
 		const instructorId = instructorResult.data._id
 
-		// Verify course belongs to instructor
 		const courseExists = await client.fetch(
 			`*[_type == "course" && _id == $courseId && instructor._ref == $instructorId][0]._id`,
 			{ courseId, instructorId }
@@ -419,17 +402,14 @@ export async function uploadCourseImageAction(formData: FormData) {
 			}
 		}
 
-		// Convert the file to a buffer
 		const bytes = await image.arrayBuffer()
 		const buffer = Buffer.from(bytes)
 
-		// Upload the image to Sanity
 		const imageAsset = await client.assets.upload('image', buffer, {
 			filename: image.name,
 			contentType: image.type,
 		})
 
-		// Update the course with the new image
 		await client
 			.patch(courseId)
 			.set({
@@ -443,7 +423,6 @@ export async function uploadCourseImageAction(formData: FormData) {
 			})
 			.commit()
 
-		// Revalidate paths
 		revalidatePath(`/creator-dashboard/courses/${courseId}/edit`)
 		revalidatePath(`/creator-dashboard`)
 		revalidatePath(`/courses`)
@@ -461,7 +440,7 @@ export async function uploadCourseImageAction(formData: FormData) {
 		}
 	}
 }
-// Update the key generation logic in the updateCourseCurriculumAction
+
 export async function updateCourseCurriculumAction(data: CurriculumData) {
 	try {
 		const { courseId, modules } = data
@@ -470,7 +449,6 @@ export async function updateCourseCurriculumAction(data: CurriculumData) {
 			modules.map(async (courseModule, moduleIndex) => {
 				let moduleId = courseModule._id
 
-				// Ensure consistent key generation
 				const moduleKey =
 					courseModule._key || `module-${moduleId || moduleIndex}-${Date.now()}`
 
@@ -492,7 +470,6 @@ export async function updateCourseCurriculumAction(data: CurriculumData) {
 
 				const processedLessons = await Promise.all(
 					courseModule.lessons.map(async (lesson, lessonIndex) => {
-						// Ensure consistent key generation for lessons
 						const lessonKey =
 							lesson._key || `lesson-${lesson._id || lessonIndex}-${Date.now()}`
 
@@ -542,7 +519,6 @@ export async function updateCourseCurriculumAction(data: CurriculumData) {
 					})
 				)
 
-				// Attach lessons to the module
 				await client
 					.patch(moduleId)
 					.set({
@@ -558,7 +534,6 @@ export async function updateCourseCurriculumAction(data: CurriculumData) {
 			})
 		)
 
-		// Update course modules
 		await client
 			.patch(courseId)
 			.set({
@@ -566,7 +541,6 @@ export async function updateCourseCurriculumAction(data: CurriculumData) {
 			})
 			.commit()
 
-		// Revalidate paths
 		revalidatePath(`/creator-dashboard/courses/${courseId}/content`)
 		revalidatePath(`/creator-dashboard/courses/${courseId}/edit`)
 		revalidatePath(`/creator-dashboard`)

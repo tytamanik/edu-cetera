@@ -2,10 +2,26 @@
 import { getInstructorProfileAction } from '@/app/actions/instructorActions'
 import CreateCourseButton from '@/components/dashboard/CreateCourseButton'
 import InstructorCourseCard from '@/components/dashboard/InstructorCourseCard'
-import { getCategories } from '@/sanity/lib/categories/getCategories'
+import { Category } from '@/sanity/lib/categories/getCategories'
 import { currentUser } from '@clerk/nextjs/server'
 import { BookOpen, GraduationCap, PlusCircle, Users } from 'lucide-react'
 import { redirect } from 'next/navigation'
+
+interface Course {
+	_id: string
+	title?: string
+	published?: boolean
+	slug?: { current?: string }
+}
+
+interface InstructorProfileResponse {
+	success: boolean
+	instructor: {
+		_id?: string
+		name?: string
+		courses?: Course[]
+	} | null
+}
 
 export default async function CreatorDashboardPage() {
 	const user = await currentUser()
@@ -14,18 +30,11 @@ export default async function CreatorDashboardPage() {
 		return redirect('/')
 	}
 
-	interface InstructorProfileResponse {
-		success: boolean
-		instructor: {
-			_id?: string
-			name?: string
-			courses?: Course[]
-		} | null
-	}
-
 	const [{ success, instructor }, categoriesData] = await Promise.all([
 		getInstructorProfileAction(user.id) as Promise<InstructorProfileResponse>,
-		getCategories(),
+		import('@/sanity/lib/categories/getCategories').then(module =>
+			module.getCategories()
+		),
 	])
 
 	if (!success || !instructor) {
@@ -34,18 +43,12 @@ export default async function CreatorDashboardPage() {
 
 	const { courses = [] } = instructor
 
-	const categories = categoriesData.map((category: any) => ({
+	const categories = categoriesData.map((category: Category) => ({
 		_id: category._id,
 		name: category.name,
 		slug: category.slug,
 		color: category.color,
 	}))
-
-	interface Course {
-		_id: string
-		title?: string
-		published?: boolean
-	}
 
 	const totalCourses = courses.length
 	const publishedCourses = courses.filter(

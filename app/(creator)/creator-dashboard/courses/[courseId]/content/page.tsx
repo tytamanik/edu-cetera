@@ -9,6 +9,22 @@ import { ArrowLeft, BookOpen, Layers } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
+interface Lesson {
+	_id: string
+	title?: string
+	slug?: { current: string }
+	description?: string
+	videoUrl?: string
+	loomUrl?: string
+	content?: unknown[]
+}
+
+interface Module {
+	_id: string
+	title?: string
+	lessons?: Lesson[]
+}
+
 export interface CourseContentPageProps {
 	params: Promise<{
 		courseId: string
@@ -64,7 +80,7 @@ export default async function CourseContentPage({
 								<p className='text-sm text-muted-foreground'>
 									{curriculum.modules?.length || 0} modules ·{' '}
 									{curriculum.modules?.reduce(
-										(acc: number, module: { lessons?: Array<any> }) =>
+										(acc: number, module: Module) =>
 											acc + (module.lessons?.length || 0),
 										0
 									) || 0}{' '}
