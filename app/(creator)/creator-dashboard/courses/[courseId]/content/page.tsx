@@ -9,21 +9,23 @@ import { getCourseForEditing } from '@/sanity/lib/courses/getCourseForEditing'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
-interface CourseContentPageProps {
+export interface Params {
 	params: {
 		courseId: string
 	}
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export interface PageProps extends Params {
+	searchParams?: { [key: string]: string | string[] | undefined }
+}
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
 	return {
-		title: 'Edit Course Content',
+		title: `Edit Course Content: ${params.courseId}`,
 	}
 }
 
-export default async function CourseContentPage({
-	params,
-}: CourseContentPageProps) {
+export default async function CourseContentPage({ params }: PageProps) {
 	const user = await currentUser()
 	if (!user?.id) {
 		return redirect('/')
