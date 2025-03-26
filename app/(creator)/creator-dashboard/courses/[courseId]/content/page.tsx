@@ -6,7 +6,7 @@ import { currentUser } from '@clerk/nextjs/server'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-
+// Trigger
 interface CourseContentPageProps {
 	params: {
 		courseId: string
