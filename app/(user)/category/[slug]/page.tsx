@@ -1,4 +1,7 @@
+// Insert this file at app/(user)/category/[slug]/page.tsx
+
 import { CourseCard } from '@/components/CourseCard'
+import { GetCoursesQueryResult } from '@/sanity.types'
 import { getCategoryBySlug } from '@/sanity/lib/categories/getCategoryBySlug'
 import { getCoursesByCategory } from '@/sanity/lib/courses/getCoursesByCategory'
 import { Folder } from 'lucide-react'
@@ -6,13 +9,13 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 interface CategoryPageProps {
-	params: {
+	params: Promise<{
 		slug: string
-	}
+	}>
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
-	const { slug } = params
+	const { slug } = await params
 	const [category, courses] = await Promise.all([
 		getCategoryBySlug(slug),
 		getCoursesByCategory(slug),
@@ -79,7 +82,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 				</div>
 			) : (
 				<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-					{courses.map(course => (
+					{courses.map((course: GetCoursesQueryResult[number]) => (
 						<CourseCard
 							key={course._id}
 							course={course}
