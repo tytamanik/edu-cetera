@@ -1,4 +1,3 @@
-// File: sanity/lib/courses/getAllCourses.ts - Replace the entire content of this file
 import { defineQuery } from 'groq'
 import { sanityFetch } from '../live'
 
@@ -16,12 +15,10 @@ export interface CourseFilters {
 
 export async function getAllCourses(filters?: CourseFilters, sort?: string) {
 	try {
-		// Build filter conditions
 		const filterConditions = [`_type == "course" && published == true`]
 
 		if (filters) {
 			if (filters.categories && filters.categories.length > 0) {
-				// Get category IDs by slug and filter courses by them
 				filterConditions.push(`category->slug.current in $categorySlugs`)
 			}
 
@@ -53,7 +50,6 @@ export async function getAllCourses(filters?: CourseFilters, sort?: string) {
 			}
 		}
 
-		// Build order by clause
 		let orderBy = 'title asc'
 		if (sort) {
 			switch (sort) {
@@ -76,7 +72,6 @@ export async function getAllCourses(filters?: CourseFilters, sort?: string) {
 			}
 		}
 
-		// Build the query
 		const queryString = `*[${filterConditions.join(' && ')}] {
       ...,
       "slug": slug.current,
@@ -98,7 +93,6 @@ export async function getAllCourses(filters?: CourseFilters, sort?: string) {
 
 		const allCoursesQuery = defineQuery(queryString)
 
-		// Prepare params object
 		const params: Record<string, any> = {}
 
 		if (filters?.categories?.length) {

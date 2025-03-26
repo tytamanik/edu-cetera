@@ -1,4 +1,3 @@
-// File: app/(user)/profile/page.tsx
 import { checkInstructorStatusAction } from '@/app/actions/instructorActions'
 import { CourseCard } from '@/components/CourseCard'
 import { Button } from '@/components/ui/button'
@@ -43,7 +42,6 @@ export default async function ProfilePage() {
 		)
 	}
 
-	// Fetch all relevant data for the profile page
 	const [enrolledCoursesResult, bookmarksResult, { isInstructor }] =
 		await Promise.all([
 			getEnrolledCourses(user.id),
@@ -54,7 +52,6 @@ export default async function ProfilePage() {
 	const enrolledCourses = enrolledCoursesResult || []
 	const bookmarks = bookmarksResult || []
 
-	// Get course progress for all enrolled courses
 	const coursesWithProgress = await Promise.all(
 		enrolledCourses.map(async ({ course, _id }) => {
 			if (!course) return null
@@ -76,12 +73,10 @@ export default async function ProfilePage() {
 		})
 	)
 
-	// Filter out nulls from courses with progress
 	const validCoursesWithProgress = coursesWithProgress.filter(
 		course => course !== null
 	)
 
-	// Calculate overall learning stats
 	const totalCoursesEnrolled = validCoursesWithProgress.length
 	const completedCourses = validCoursesWithProgress.filter(
 		course => course?.progress === 100

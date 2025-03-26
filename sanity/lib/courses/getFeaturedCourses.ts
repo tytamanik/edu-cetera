@@ -1,10 +1,8 @@
-// File: sanity/lib/courses/getFeaturedCourses.ts
 import { defineQuery } from 'groq'
 import { sanityFetch } from '../live'
 
 export async function getFeaturedCourses(limit = 6) {
 	try {
-		// Get courses with highest enrollment counts, which we'll consider as "featured"
 		const featuredCoursesQuery =
 			defineQuery(`*[_type == "course" && published == true] {
       ...,
@@ -36,7 +34,6 @@ export async function getFeaturedCourses(limit = 6) {
 	}
 }
 
-// Get newest courses
 export async function getNewestCourses(limit = 3) {
 	try {
 		const newestCoursesQuery =
@@ -69,7 +66,6 @@ export async function getNewestCourses(limit = 3) {
 	}
 }
 
-// Get popular categories with course counts
 export async function getPopularCategories(limit = 5) {
 	try {
 		const popularCategoriesQuery = defineQuery(`*[_type == "category"] {

@@ -1,4 +1,3 @@
-// File: app/(user)/subscriptions/page.tsx
 import { FollowInstructorButton } from '@/components/FollowInstructorButton'
 import { Button } from '@/components/ui/button'
 import { urlFor } from '@/sanity/lib/image'

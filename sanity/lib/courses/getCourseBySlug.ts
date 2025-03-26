@@ -1,4 +1,3 @@
-// File: sanity/lib/courses/getCourseBySlug.ts
 import { defineQuery } from 'groq'
 import { getInstructorByClerkId } from '../instructor/getInstructorByClerkId'
 import { sanityFetch } from '../live'

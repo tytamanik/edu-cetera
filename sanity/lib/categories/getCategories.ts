@@ -1,4 +1,3 @@
-// File: sanity/lib/categories/getCategories.ts
 import { client } from '../client'
 
 export interface Category {

@@ -1,4 +1,3 @@
-// File: components/dashboard/InstructorCourseCard.tsx
 'use client'
 
 import { Badge } from '@/components/ui/badge'

@@ -1,4 +1,3 @@
-// File: components/dashboard/CategorySelect.tsx
 'use client'
 
 import {

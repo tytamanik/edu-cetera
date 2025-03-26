@@ -1,4 +1,3 @@
-// File: sanity/lib/student/getEnrolledCourses.ts
 import { defineQuery } from 'groq'
 import { sanityFetch } from '../live'
 
@@ -21,7 +20,5 @@ export async function getEnrolledCourses(clerkId: string) {
 		params: { clerkId },
 	})
 
-	// Keep all enrolled courses regardless of published status
-	// The user has already enrolled and should be able to access them
 	return result?.data?.enrolledCourses || []
 }

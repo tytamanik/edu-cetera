@@ -1,4 +1,3 @@
-// File: sanity/lib/instructor/isFollowingInstructor.ts
 import { defineQuery } from 'groq'
 import { sanityFetch } from '../live'
 import { getStudentByClerkId } from '../student/getStudentByClerkId'

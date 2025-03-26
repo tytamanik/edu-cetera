@@ -1,4 +1,3 @@
-// File: app/(user)/category/[slug]/page.tsx
 import { CourseCard } from '@/components/CourseCard'
 import { getCategoryBySlug } from '@/sanity/lib/categories/getCategoryBySlug'
 import { getCoursesByCategory } from '@/sanity/lib/courses/getCoursesByCategory'

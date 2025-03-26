@@ -1,4 +1,3 @@
-// File: app/actions/courseActions.ts
 'use server'
 
 import { client } from '@/sanity/lib/adminClient'

@@ -1,4 +1,3 @@
-// File: app/(user)/instructor/[id]/page.tsx
 import { CourseCard } from '@/components/CourseCard'
 import { FollowInstructorButton } from '@/components/FollowInstructorButton'
 import { Button } from '@/components/ui/button'
@@ -23,7 +22,6 @@ export default async function InstructorProfilePage({
 	const { id } = params
 	const user = await currentUser()
 
-	// Fetch instructor and check if the current user is following them
 	const [instructor, isFollowing] = await Promise.all([
 		getInstructorById(id),
 		user?.id ? isFollowingInstructor(user.id, id) : false,

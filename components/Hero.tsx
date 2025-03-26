@@ -1,4 +1,3 @@
-// File: components/Hero.tsx - Replace the entire content of this file
 'use client'
 
 import { Search } from 'lucide-react'

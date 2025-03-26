@@ -1,4 +1,3 @@
-// File: sanity/lib/instructor/getSubscribedInstructors.ts
 import { defineQuery } from 'groq'
 import { sanityFetch } from '../live'
 import { getStudentByClerkId } from '../student/getStudentByClerkId'
@@ -11,7 +10,6 @@ export async function getSubscribedInstructors(clerkId: string) {
 			return []
 		}
 
-		// Get the instructors the student follows
 		const followedInstructorsQuery =
 			defineQuery(`*[_type == "instructorFollow" && student._ref == $studentId] {
       "instructor": instructor-> {
@@ -41,11 +39,9 @@ export async function getSubscribedInstructors(clerkId: string) {
 			},
 		})
 
-		// Map the results to get just the instructor objects with the followedAt data
 		return (result.data || []).map((follow: any) => {
 			const instructor = follow.instructor || {}
 
-			// Add activity information based on most recent course
 			const latestCourse =
 				instructor.recentCourses && instructor.recentCourses.length > 0
 					? instructor.recentCourses[0]

@@ -1,4 +1,3 @@
-// File: sanity/lib/instructor/getInstructorById.ts
 import { defineQuery } from 'groq'
 import { sanityFetch } from '../live'
 

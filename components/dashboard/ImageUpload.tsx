@@ -1,4 +1,3 @@
-// File: components/dashboard/ImageUpload.tsx
 'use client'
 
 import { uploadCourseImageAction } from '@/app/actions/courseActions'
@@ -28,13 +27,11 @@ export default function ImageUpload({
 		const file = e.target.files?.[0]
 		if (!file) return
 
-		// Check file type
 		if (!file.type.startsWith('image/')) {
 			setError('Please upload an image file')
 			return
 		}
 
-		// Check file size (2MB max)
 		if (file.size > 2 * 1024 * 1024) {
 			setError('Image size should be less than 2MB')
 			return

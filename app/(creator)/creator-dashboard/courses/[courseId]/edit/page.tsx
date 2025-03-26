@@ -1,4 +1,3 @@
-// File: app/(creator)/creator-dashboard/courses/[courseId]/edit/page.tsx
 import CourseForm from '@/components/dashboard/CourseForm'
 import CoursePreviewButton from '@/components/dashboard/CoursePreviewButton'
 import DeleteCourseButton from '@/components/dashboard/DeleteCourseButton'

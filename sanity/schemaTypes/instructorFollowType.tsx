@@ -1,4 +1,3 @@
-// File: sanity/schemaTypes/instructorFollowType.tsx
 import { defineField, defineType } from 'sanity'
 
 export const instructorFollowType = defineType({

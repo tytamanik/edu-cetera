@@ -1,4 +1,3 @@
-// File: app/(creator)/creator-dashboard/courses/[courseId]/content/page.tsx
 import CourseContentEditor from '@/components/dashboard/CourseContentEditor'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'

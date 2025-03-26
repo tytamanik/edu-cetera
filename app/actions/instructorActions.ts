@@ -1,4 +1,3 @@
-// File: app/actions/instructorActions.ts
 'use server'
 
 import { client } from '@/sanity/lib/adminClient'
@@ -78,10 +77,8 @@ export async function toggleFollowInstructorAction(
 		const isFollowing = await isFollowingInstructor(clerkId, instructorId)
 
 		if (isFollowing) {
-			// Unfollow the instructor
 			await unfollowInstructor(student.data._id, instructorId)
 		} else {
-			// Follow the instructor
 			await followInstructor(student.data._id, instructorId)
 		}
 

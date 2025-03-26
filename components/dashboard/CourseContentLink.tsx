@@ -1,4 +1,3 @@
-// File: components/dashboard/CourseContentLink.tsx
 'use client'
 
 import { Button } from '@/components/ui/button'

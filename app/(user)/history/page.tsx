@@ -1,4 +1,3 @@
-// File: app/(user)/history/page.tsx
 import { getLessonCompletionHistory } from '@/sanity/lib/lessons/getLessonCompletionHistory'
 import { currentUser } from '@clerk/nextjs/server'
 import { History } from 'lucide-react'

@@ -1,4 +1,3 @@
-// File: sanity/lib/lessons/getLessonCompletionHistory.ts
 import { defineQuery } from 'groq'
 import { urlFor } from '../image'
 import { sanityFetch } from '../live'
@@ -39,7 +38,6 @@ export async function getLessonCompletionHistory(clerkId: string) {
 			params: { studentId: student.data._id },
 		})
 
-		// Process the results to add image URLs and ensure consistent data structure
 		return (result.data || []).map((completion: any) => ({
 			...completion,
 			completedAt: completion.completedAt || new Date().toISOString(),

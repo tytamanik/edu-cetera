@@ -1,4 +1,3 @@
-// File: app/(user)/page.tsx
 import { CourseCard } from '@/components/CourseCard'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
@@ -10,11 +9,9 @@ import {
 import { BookOpen, Compass, GraduationCap, Star } from 'lucide-react'
 import Link from 'next/link'
 
-// Using revalidation for performance, but can be adjusted as needed
-export const revalidate = 3600 // 1 hour
+export const revalidate = 3600
 
 export default async function Home() {
-	// Fetch data in parallel for better performance
 	const [featuredCourses, newestCourses, popularCategories] = await Promise.all(
 		[getFeaturedCourses(6), getNewestCourses(3), getPopularCategories(5)]
 	)
@@ -23,7 +20,6 @@ export default async function Home() {
 		<div className='pb-20 sm:pb-6'>
 			<Hero />
 
-			{/* Featured Courses Section */}
 			<section className='container mx-auto px-4 py-12'>
 				<div className='flex flex-col md:flex-row md:items-center md:justify-between mb-8'>
 					<div>
@@ -116,7 +112,6 @@ export default async function Home() {
 				</div>
 			</section>
 
-			{/* New Releases Section */}
 			<section className='container mx-auto px-4 py-12'>
 				<div className='flex flex-col md:flex-row md:items-center md:justify-between mb-8'>
 					<div>
@@ -199,7 +194,6 @@ export default async function Home() {
 				</div>
 			</section>
 
-			{/* CTA Section */}
 			<section className='bg-gradient-to-r from-primary/90 to-primary text-white py-16'>
 				<div className='container mx-auto px-4 text-center'>
 					<h2 className='text-3xl font-bold mb-4'>Ready to Start Learning?</h2>

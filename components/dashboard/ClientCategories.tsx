@@ -1,4 +1,3 @@
-// File: components/dashboard/ClientCategories.tsx
 'use client'
 
 import { getCategoriesAction } from '@/app/actions/categoryActions'

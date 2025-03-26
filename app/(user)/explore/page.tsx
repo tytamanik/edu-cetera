@@ -1,4 +1,3 @@
-// File: app/(user)/explore/page.tsx
 import { CourseCard } from '@/components/CourseCard'
 import { getCategories } from '@/sanity/lib/categories/getCategories'
 import { searchCourses } from '@/sanity/lib/courses/searchCourses'
@@ -13,7 +12,6 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
-// Mapping of category names to icons
 const categoryIcons = {
 	Technology: Code,
 	Business: Briefcase,
@@ -24,7 +22,7 @@ const categoryIcons = {
 	Entrepreneurship: Briefcase,
 	'Graphic Design': PenTool,
 	'Digital Marketing': Globe,
-	// Add more mappings as needed
+
 	default: BookOpen,
 }
 
@@ -41,14 +39,11 @@ export default async function ExplorePage() {
 
 			<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8'>
 				{categories.map(category => {
-					// Find the appropriate icon, default to BookOpen if not found
 					const CategoryIcon =
 						categoryIcons[category.name] || categoryIcons['default']
 
-					// Debug log to see what we're working with
 					console.log(`Category ${category.name} slug:`, category.slug)
 
-					// Ensure slug is properly accessed
 					const slugValue =
 						typeof category.slug === 'string'
 							? category.slug

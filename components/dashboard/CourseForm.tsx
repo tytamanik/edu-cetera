@@ -1,4 +1,3 @@
-// File: components/dashboard/CourseForm.tsx
 'use client'
 
 import { updateCourseAction } from '@/app/actions/courseActions'

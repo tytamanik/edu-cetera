@@ -1,10 +1,8 @@
-// File: sanity/lib/courses/getCoursesByCategory.ts
 import { defineQuery } from 'groq'
 import { sanityFetch } from '../live'
 
 export async function getCoursesByCategory(categorySlug: string) {
 	try {
-		// First, ensure the category exists
 		const categoryQuery = defineQuery(
 			`*[_type == "category" && slug.current == $categorySlug][0]._id`
 		)
@@ -17,7 +15,6 @@ export async function getCoursesByCategory(categorySlug: string) {
 			return []
 		}
 
-		// Then fetch courses for that category
 		const getCoursesByCategoryQuery =
 			defineQuery(`*[_type == "course" && published == true && category._ref == $categoryId] {
       ...,

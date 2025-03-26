@@ -1,4 +1,3 @@
-// File: sanity/lib/categories/getCategoryBySlug.ts
 import { defineQuery } from 'groq'
 import { sanityFetch } from '../live'
 

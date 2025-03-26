@@ -1,4 +1,3 @@
-// File: components/dashboard/CreateCourseButton.tsx
 'use client'
 
 import { createCourseAction } from '@/app/actions/courseActions'

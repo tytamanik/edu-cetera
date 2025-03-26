@@ -1,4 +1,3 @@
-// File: components/FollowInstructorButton.tsx
 'use client'
 
 import { toggleFollowInstructorAction } from '@/app/actions/instructorActions'
@@ -38,14 +37,13 @@ export function FollowInstructorButton({
 				const result = await toggleFollowInstructorAction(instructorId, userId)
 
 				if (!result.success) {
-					// Revert UI state if the action failed
 					setFollowing(prev => !prev)
 				}
 
 				router.refresh()
 			} catch (error) {
 				console.error('Error toggling instructor follow:', error)
-				// Revert UI state if there was an error
+
 				setFollowing(prev => !prev)
 			}
 		})

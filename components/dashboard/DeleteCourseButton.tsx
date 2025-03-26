@@ -1,4 +1,3 @@
-// File: components/dashboard/DeleteCourseButton.tsx
 'use client'
 
 import { deleteCourseAction } from '@/app/actions/courseActions'

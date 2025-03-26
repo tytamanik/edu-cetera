@@ -1,4 +1,3 @@
-// File: sanity/lib/instructor/followInstructor.ts
 import { client } from '../adminClient'
 
 export async function followInstructor(
@@ -29,7 +28,6 @@ export async function unfollowInstructor(
 	instructorId: string
 ) {
 	try {
-		// Find the follow record ID
 		const followId = await client.fetch(
 			`*[_type == "instructorFollow" && student._ref == $studentId && instructor._ref == $instructorId][0]._id`,
 			{ studentId, instructorId }
@@ -39,7 +37,6 @@ export async function unfollowInstructor(
 			throw new Error('Follow record not found')
 		}
 
-		// Delete the follow record
 		return await client.delete(followId)
 	} catch (error) {
 		console.error('Error unfollowing instructor:', error)

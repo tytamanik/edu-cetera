@@ -1,4 +1,3 @@
-// File: app/(user)/courses/[slug]/page.tsx
 import { BookmarkButton } from '@/components/BookmarkButton'
 import EnrollButton from '@/components/EnrollButton'
 import { GetCourseBySlugQueryResult } from '@/sanity.types'

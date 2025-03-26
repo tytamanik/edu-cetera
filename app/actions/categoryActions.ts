@@ -1,4 +1,3 @@
-// File: app/actions/categoryActions.ts
 'use server'
 
 import { Category, getCategories } from '@/sanity/lib/categories/getCategories'

@@ -1,4 +1,3 @@
-// File: app/(user)/courses/page.tsx - Replace the entire content of this file
 import { CourseCard } from '@/components/CourseCard'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -17,7 +16,6 @@ export default async function CoursesPage({
 }: {
 	searchParams: { [key: string]: string | string[] | undefined }
 }) {
-	// Parse filter parameters from the URL
 	const sort = (searchParams.sort as string) || 'popular'
 	const categoryParam = searchParams.category as string | string[]
 	const categories = Array.isArray(categoryParam)
@@ -29,7 +27,6 @@ export default async function CoursesPage({
 	const isPaid = searchParams.paid === 'true'
 	const priceRange = searchParams.priceRange as string
 
-	// Parse price range if it exists
 	let priceRangeFilter = undefined
 	if (priceRange) {
 		const [min, max] = priceRange.split('-').map(Number)
@@ -39,7 +36,6 @@ export default async function CoursesPage({
 		}
 	}
 
-	// Create filters object
 	const filters: CourseFilters = {
 		categories: categories,
 		isFree: isFree,
@@ -52,14 +48,12 @@ export default async function CoursesPage({
 		getCategories(),
 	])
 
-	// Get active filter count for UI
 	const activeFilterCount =
 		(categories.length > 0 ? 1 : 0) +
 		(isFree ? 1 : 0) +
 		(isPaid ? 1 : 0) +
 		(priceRange ? 1 : 0)
 
-	// Helper function to generate filter URLs
 	const getFilterUrl = (
 		params: Record<string, string | string[] | boolean | null>
 	) => {
@@ -67,20 +61,16 @@ export default async function CoursesPage({
 			typeof window !== 'undefined' ? window.location.href : 'http://localhost'
 		)
 
-		// Start with current parameters
 		const urlParams = new URLSearchParams()
 
-		// Preserve current sort
 		if (sort) {
 			urlParams.set('sort', sort)
 		}
 
-		// Preserve current price range if not specifically changing it
 		if (priceRange && !params.hasOwnProperty('priceRange')) {
 			urlParams.set('priceRange', priceRange)
 		}
 
-		// Preserve free/paid filters if not specifically changing them
 		if (isFree && !params.hasOwnProperty('free')) {
 			urlParams.set('free', 'true')
 		}
@@ -89,7 +79,6 @@ export default async function CoursesPage({
 			urlParams.set('paid', 'true')
 		}
 
-		// Add/replace parameters based on the argument
 		Object.entries(params).forEach(([key, value]) => {
 			if (value === null) {
 				urlParams.delete(key)
@@ -106,27 +95,22 @@ export default async function CoursesPage({
 		return `/courses?${urlParams.toString()}`
 	}
 
-	// Function to check if a category is active
 	const isCategoryActive = (categorySlug: string) => {
 		return categories.includes(categorySlug)
 	}
 
-	// Function to toggle a category in the active filter list
 	const toggleCategory = (categorySlug: string) => {
 		if (isCategoryActive(categorySlug)) {
-			// Remove category from filter
 			return getFilterUrl({
 				category: categories.filter(c => c !== categorySlug),
 			})
 		} else {
-			// Add category to filter
 			return getFilterUrl({
 				category: [...categories, categorySlug],
 			})
 		}
 	}
 
-	// Function to clear all filters
 	const clearAllFilters = () => {
 		return getFilterUrl({
 			category: null,
@@ -136,7 +120,6 @@ export default async function CoursesPage({
 		})
 	}
 
-	// Price range options
 	const priceRangeOptions = [
 		{ label: 'Under $20', value: '0-20' },
 		{ label: '$20 to $50', value: '20-50' },
@@ -157,7 +140,6 @@ export default async function CoursesPage({
 			</div>
 
 			<div className='flex flex-col md:flex-row gap-6'>
-				{/* Filter sidebar */}
 				<div className='md:w-64 space-y-6'>
 					<div className='bg-card rounded-lg border p-4'>
 						<div className='flex items-center justify-between mb-4'>
@@ -237,7 +219,6 @@ export default async function CoursesPage({
 								</div>
 							</div>
 
-							{/* Price Range Filter */}
 							<div>
 								<h4 className='text-sm font-medium mb-2'>Price Range</h4>
 								<div className='space-y-2'>
@@ -267,7 +248,6 @@ export default async function CoursesPage({
 					</div>
 				</div>
 
-				{/* Main content */}
 				<div className='flex-1'>
 					<div className='mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
 						<Tabs defaultValue={sort} className='w-full sm:w-auto'>

@@ -1,4 +1,3 @@
-// File: app/(creator)/creator-dashboard/page.tsx
 import { getInstructorProfileAction } from '@/app/actions/instructorActions'
 import CreateCourseButton from '@/components/dashboard/CreateCourseButton'
 import InstructorCourseCard from '@/components/dashboard/InstructorCourseCard'
