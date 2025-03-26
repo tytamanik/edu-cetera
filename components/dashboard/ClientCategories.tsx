@@ -36,10 +36,18 @@ export default function ClientCategories({
 					setIsLoading(true)
 					const result = await getCategoriesAction()
 
-					if (result.success) {
-						setCategories(result.categories)
-						if (result.categories.length > 0 && !selectedCategory) {
-							onCategoryChange(result.categories[0].slug)
+					if (result.success && result.categories) {
+						const fetchedCategories = result.categories.map(category => ({
+							_id: category._id,
+							name: category.name,
+							slug: category.slug,
+							color: category.color,
+							icon: category.icon,
+						}))
+
+						setCategories(fetchedCategories)
+						if (fetchedCategories.length > 0 && !selectedCategory) {
+							onCategoryChange(fetchedCategories[0].slug)
 						}
 					}
 				} catch (error) {
