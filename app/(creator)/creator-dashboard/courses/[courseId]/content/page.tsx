@@ -1,21 +1,22 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import CourseContentEditor from '@/components/dashboard/CourseContentEditor'
 import { Button } from '@/components/ui/button'
 import { getCourseCurriculum } from '@/sanity/lib/courses/getCourseCurriculum'
 import { getCourseForEditing } from '@/sanity/lib/courses/getCourseForEditing'
 import { currentUser } from '@clerk/nextjs/server'
 import { ArrowLeft } from 'lucide-react'
-import type { PageProps } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
-export default async function CourseContentPage({ params }: PageProps) {
+export default async function CourseContentPage(props: any) {
+	const { params } = props
+	const courseId = params.courseId
+
 	const user = await currentUser()
 
 	if (!user?.id) {
 		return redirect('/')
 	}
-
-	const courseId = params.courseId
 
 	try {
 		const course = await getCourseForEditing(courseId, user.id)
