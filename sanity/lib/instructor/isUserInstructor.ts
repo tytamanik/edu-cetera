@@ -1,14 +1,18 @@
-import { getStudentByClerkId } from '../student/getStudentByClerkId'
+import { defineQuery } from 'groq'
+import { sanityFetch } from '../live'
 
 export async function isUserInstructor(clerkId: string) {
 	try {
-		const student = await getStudentByClerkId(clerkId)
+		const query = defineQuery(`*[_type == "student" && clerkId == $clerkId][0]{
+      "isInstructor": defined(instructor)
+    }`)
 
-		if (!student?.data) {
-			return false
-		}
+		const result = await sanityFetch({
+			query,
+			params: { clerkId },
+		})
 
-		return !!student.data.isInstructor
+		return result.data?.isInstructor === true
 	} catch (error) {
 		console.error('Error checking instructor status:', error)
 		return false
