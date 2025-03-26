@@ -1,6 +1,3 @@
-// app/(user)/my-courses/page.tsx
-// Update this file to fix the duplicate key issue
-
 import { CourseCard } from '@/components/CourseCard'
 import { getCourseProgress } from '@/sanity/lib/lessons/getCourseProgress'
 import { getEnrolledCourses } from '@/sanity/lib/student/getEnrolledCourses'
@@ -25,7 +22,7 @@ export default async function MyCoursesPage() {
 			return {
 				course,
 				progress: progress.courseProgress,
-				// Use the enrollment ID as the key
+
 				enrollmentId: _id,
 			}
 		})
@@ -61,7 +58,6 @@ export default async function MyCoursesPage() {
 
 							return (
 								<CourseCard
-									// Use enrollmentId instead of course._id to ensure uniqueness
 									key={item.enrollmentId || `enrollment-${item.course._id}`}
 									course={item.course}
 									progress={item.progress}

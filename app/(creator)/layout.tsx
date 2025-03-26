@@ -1,5 +1,7 @@
+// app/(creator)/layout.tsx
+// Create this file for the creator layout
+
 import Header from '@/components/Header'
-import { SidebarNav } from '@/components/SidebarNav'
 import { SidebarProvider } from '@/components/providers/sidebar-provider'
 import { ThemeProvider } from '@/components/theme-provider'
 import { SanityLive } from '@/sanity/lib/live'
@@ -7,11 +9,11 @@ import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-	title: 'Edu Cetera',
-	description: 'Education Platform',
+	title: 'Creator Dashboard - Edu Cetera',
+	description: 'Manage your courses and content',
 }
 
-export default function UserLayout({
+export default function CreatorLayout({
 	children,
 }: {
 	children: React.ReactNode
@@ -27,17 +29,11 @@ export default function UserLayout({
 				<SidebarProvider>
 					<div className='min-h-screen flex flex-col'>
 						<Header />
-						<div className='flex flex-1 pt-16'>
-							<SidebarNav />
-							<main className='flex-1 md:ml-20 lg:ml-20 transition-all duration-300'>
-								{children}
-							</main>
-						</div>
+						<main className='flex-1'>{children}</main>
 					</div>
 				</SidebarProvider>
+				<SanityLive />
 			</ThemeProvider>
-
-			<SanityLive />
 		</ClerkProvider>
 	)
 }

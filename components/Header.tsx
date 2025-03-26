@@ -8,6 +8,7 @@ import { Bell, BookOpen, Menu } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import DarkModeToggle from './DarkModeToggle'
+import HeaderAction from './HeaderAction'
 import { useSidebar } from './providers/sidebar-provider'
 import { SearchInput } from './SearchInput'
 import { Button } from './ui/button'
@@ -56,6 +57,7 @@ export default function Header() {
 
 				<div className='flex items-center space-x-2 md:space-x-4'>
 					<SignedIn>
+						<HeaderAction />
 						<Button variant='ghost' size='icon' className='hidden md:flex'>
 							<Bell className='h-5 w-5' />
 						</Button>

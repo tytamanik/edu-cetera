@@ -1,5 +1,3 @@
-// sanity/schemaTypes/bookmarkType.tsx
-// Create this new file
 import { defineField, defineType } from 'sanity'
 
 export const bookmarkType = defineType({
