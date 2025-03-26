@@ -5,13 +5,13 @@ import { searchCourses } from '@/sanity/lib/courses/searchCourses'
 import { Search } from 'lucide-react'
 
 interface SearchPageProps {
-	params: {
+	params: Promise<{
 		term: string
-	}
+	}>
 }
 
 export default async function SearchPage({ params }: SearchPageProps) {
-	const { term } = params
+	const { term } = await params
 	const decodedTerm = decodeURIComponent(term)
 	const courses = await searchCourses(decodedTerm)
 
