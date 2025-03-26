@@ -1,10 +1,18 @@
+// File: app/actions/instructorActions.ts
 'use server'
 
 import { client } from '@/sanity/lib/adminClient'
 import { createInstructorFromUser } from '@/sanity/lib/instructor/createInstructorFromUser'
+import {
+	followInstructor,
+	unfollowInstructor,
+} from '@/sanity/lib/instructor/followInstructor'
 import { getInstructorByClerkId } from '@/sanity/lib/instructor/getInstructorByClerkId'
+import { isFollowingInstructor } from '@/sanity/lib/instructor/isFollowingInstructor'
 import { isUserInstructor } from '@/sanity/lib/instructor/isUserInstructor'
+import { getStudentByClerkId } from '@/sanity/lib/student/getStudentByClerkId'
 import { revalidatePath } from 'next/cache'
+
 export async function becomeInstructorAction(
 	formData: FormData,
 	clerkId: string
@@ -55,6 +63,45 @@ export async function checkInstructorStatusAction(clerkId: string) {
 		return { isInstructor: false, error: 'Failed to check instructor status' }
 	}
 }
+
+export async function toggleFollowInstructorAction(
+	instructorId: string,
+	clerkId: string
+) {
+	try {
+		const student = await getStudentByClerkId(clerkId)
+
+		if (!student?.data?._id) {
+			return { success: false, error: 'Student not found' }
+		}
+
+		const isFollowing = await isFollowingInstructor(clerkId, instructorId)
+
+		if (isFollowing) {
+			// Unfollow the instructor
+			await unfollowInstructor(student.data._id, instructorId)
+		} else {
+			// Follow the instructor
+			await followInstructor(student.data._id, instructorId)
+		}
+
+		revalidatePath('/subscriptions')
+		revalidatePath(`/instructor/${instructorId}`)
+
+		return {
+			success: true,
+			following: !isFollowing,
+			message: isFollowing ? 'Unfollowed instructor' : 'Following instructor',
+		}
+	} catch (error) {
+		console.error('Error toggling instructor follow:', error)
+		return {
+			success: false,
+			error: 'Failed to toggle instructor follow',
+		}
+	}
+}
+
 export async function isUserCourseCreator(courseId: string, clerkId: string) {
 	try {
 		const instructor = await getInstructorByClerkId(clerkId)

@@ -11,42 +11,10 @@ export async function getSubscribedInstructors(clerkId: string) {
 			return []
 		}
 
-		// Get the instructors the student has enrolled in courses from
-		const instructorsQuery = defineQuery(`{
-      "enrolledCourses": *[_type == "enrollment" && student._ref == $studentId].course._ref,
-      "instructors": *[_type == "instructor" && 
-                        count(*[_type == "course" && 
-                              _id in $enrolledCoursesIds && 
-                              instructor._ref == ^._id]) > 0] {
-        _id,
-        name,
-        bio,
-        photo,
-        "courseCount": count(*[_type == "course" && instructor._ref == ^._id && published == true]),
-        "courses": *[_type == "course" && instructor._ref == ^._id && published == true] | order(_createdAt desc)[0..2] {
-          _id,
-          title,
-          "slug": slug.current,
-          _createdAt
-        }
-      }
-    }`)
-
-		const result = await sanityFetch({
-			query: instructorsQuery,
-			params: {
-				studentId: student.data._id,
-				enrolledCoursesIds: [], // This will be populated from the first query result
-			},
-		})
-
-		// Run a second query with the enrolled course IDs
-		if (result.data?.enrolledCourses?.length) {
-			const instructorsWithCoursesQuery =
-				defineQuery(`*[_type == "instructor" && 
-        count(*[_type == "course" && 
-              _id in $enrolledCoursesIds && 
-              instructor._ref == ^._id]) > 0] {
+		// Get the instructors the student follows
+		const followedInstructorsQuery =
+			defineQuery(`*[_type == "instructorFollow" && student._ref == $studentId] {
+      "instructor": instructor-> {
         _id,
         name,
         bio,
@@ -57,36 +25,46 @@ export async function getSubscribedInstructors(clerkId: string) {
           title,
           "slug": slug.current,
           _createdAt,
-          description
-        }
-      }`)
+          description,
+          image
+        },
+        "followerCount": count(*[_type == "instructorFollow" && instructor._ref == ^._id]),
+        "studentCount": count(*[_type == "enrollment" && course->instructor._ref == ^._id])
+      },
+      followedAt
+    } | order(followedAt desc)`)
 
-			const instructorsResult = await sanityFetch({
-				query: instructorsWithCoursesQuery,
-				params: {
-					enrolledCoursesIds: result.data.enrolledCourses,
-				},
-			})
+		const result = await sanityFetch({
+			query: followedInstructorsQuery,
+			params: {
+				studentId: student.data._id,
+			},
+		})
 
-			// Add real recent activity for instructors based on their latest courses
-			return (instructorsResult.data || []).map((instructor: any) => {
-				const latestCourse =
-					instructor.recentCourses?.length > 0
-						? instructor.recentCourses[0]
-						: null
+		// Map the results to get just the instructor objects with the followedAt data
+		return (result.data || []).map((follow: any) => {
+			const instructor = follow.instructor || {}
 
-				return {
-					...instructor,
-					recentActivity: latestCourse
-						? `Published a new course: ${latestCourse.title}`
-						: 'No recent activity',
-					recentCourse: latestCourse?.title || 'No recent courses',
-					recentCourseSlug: latestCourse?.slug || '',
-				}
-			})
-		}
+			// Add activity information based on most recent course
+			const latestCourse =
+				instructor.recentCourses && instructor.recentCourses.length > 0
+					? instructor.recentCourses[0]
+					: null
 
-		return []
+			return {
+				...instructor,
+				followedAt: follow.followedAt,
+				recentActivity: latestCourse
+					? `Published a new course: ${latestCourse.title}`
+					: 'No recent activity',
+				recentCourse: latestCourse?.title || 'No recent courses',
+				recentCourseSlug: latestCourse?.slug || '',
+				recentCourseImage: latestCourse?.image || null,
+				recentCourseDate: latestCourse?._createdAt
+					? new Date(latestCourse._createdAt).toLocaleDateString()
+					: '',
+			}
+		})
 	} catch (error) {
 		console.error('Error fetching subscribed instructors:', error)
 		return []

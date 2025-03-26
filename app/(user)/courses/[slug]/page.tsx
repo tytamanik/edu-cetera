@@ -131,24 +131,29 @@ export default async function CoursePage({ params }: CoursePageProps) {
 							{course.instructor && (
 								<div>
 									<div className='flex items-center gap-3 mb-4'>
-										{course.instructor.photo && (
-											<div className='relative h-12 w-12'>
-												<Image
-													src={urlFor(course.instructor.photo).url() || ''}
-													alt={course.instructor.name || 'Course Instructor'}
-													fill
-													className='rounded-full object-cover'
-												/>
+										<Link
+											href={`/instructor/${course.instructor._id}`}
+											className='flex items-center gap-3'
+										>
+											{course.instructor.photo && (
+												<div className='relative h-12 w-12'>
+													<Image
+														src={urlFor(course.instructor.photo).url() || ''}
+														alt={course.instructor.name || 'Course Instructor'}
+														fill
+														className='rounded-full object-cover hover:opacity-80 transition-opacity'
+													/>
+												</div>
+											)}
+											<div>
+												<div className='font-medium hover:text-primary transition-colors'>
+													{course.instructor.name}
+												</div>
+												<div className='text-sm text-muted-foreground'>
+													Instructor
+												</div>
 											</div>
-										)}
-										<div>
-											<div className='font-medium'>
-												{course.instructor.name}
-											</div>
-											<div className='text-sm text-muted-foreground'>
-												Instructor
-											</div>
-										</div>
+										</Link>
 									</div>
 									{course.instructor.bio && (
 										<p className='text-muted-foreground'>

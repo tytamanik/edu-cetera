@@ -4,6 +4,7 @@ import { bookmarkType } from './bookmarkType'
 import { categoryType } from './categoryType'
 import { courseType } from './courseType'
 import { enrollmentType } from './enrollmentType'
+import { instructorFollowType } from './instructorFollowType'
 import { instructorType } from './instructorType'
 import { lessonCompletionType } from './lessonCompletionType'
 import { lessonType } from './lessonType'
@@ -22,6 +23,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
 		categoryType,
 		lessonCompletionType,
 		bookmarkType,
+		instructorFollowType,
 	],
 }
 
@@ -29,6 +31,7 @@ export * from './bookmarkType'
 export * from './categoryType'
 export * from './courseType'
 export * from './enrollmentType'
+export * from './instructorFollowType'
 export * from './instructorType'
 export * from './lessonCompletionType'
 export * from './lessonType'
