@@ -2,6 +2,7 @@ import { checkInstructorStatusAction } from '@/app/actions/instructorActions'
 import { CourseCard } from '@/components/CourseCard'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { GetCoursesQueryResult } from '@/sanity.types'
 import { getBookmarks } from '@/sanity/lib/bookmarks/getBookmarks'
 import { getCourseProgress } from '@/sanity/lib/lessons/getCourseProgress'
 import { getEnrolledCourses } from '@/sanity/lib/student/getEnrolledCourses'
@@ -11,7 +12,6 @@ import { Bookmark, BookOpen, GraduationCap, User } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-
 export default async function ProfilePage() {
 	const user = await currentUser()
 
@@ -317,17 +317,24 @@ export default async function ProfilePage() {
 									</div>
 								) : (
 									<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-										{bookmarks.slice(0, 4).map(bookmark => {
-											if (!bookmark.course) return null
+										{bookmarks
+											.slice(0, 4)
+											.map(
+												(bookmark: {
+													_id: string
+													course: GetCoursesQueryResult[number] | null
+												}) => {
+													if (!bookmark.course) return null
 
-											return (
-												<CourseCard
-													key={bookmark._id}
-													course={bookmark.course}
-													href={`/courses/${bookmark.course.slug}`}
-												/>
-											)
-										})}
+													return (
+														<CourseCard
+															key={bookmark._id}
+															course={bookmark.course}
+															href={`/courses/${bookmark.course.slug}`}
+														/>
+													)
+												}
+											)}
 									</div>
 								)}
 							</div>

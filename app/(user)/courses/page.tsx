@@ -1,6 +1,7 @@
 import { CourseCard } from '@/components/CourseCard'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { GetCoursesQueryResult } from '@/sanity.types'
 import { getCategories } from '@/sanity/lib/categories/getCategories'
 import {
 	CourseFilters,
@@ -8,7 +9,6 @@ import {
 } from '@/sanity/lib/courses/getAllCourses'
 import { BookOpen, Clock, Filter, SortAsc, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
-
 export const dynamic = 'force-dynamic'
 
 export default async function CoursesPage({
@@ -306,7 +306,7 @@ export default async function CoursesPage({
 						</div>
 					) : (
 						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-							{courses.map(course => (
+							{courses.map((course: GetCoursesQueryResult[number]) => (
 								<CourseCard
 									key={course._id}
 									course={course}

@@ -13,7 +13,26 @@ export default async function HistoryPage() {
 	}
 
 	const completions = await getLessonCompletionHistory(user.id)
-
+	type LessonCompletion = {
+		_id: string
+		completedAt: string
+		lesson: {
+			_id: string
+			title: string
+			slug: string
+			description: string
+		}
+		module: {
+			_id: string
+			title: string
+		}
+		course: {
+			_id: string
+			title: string
+			slug: string
+			imageUrl: string | null
+		}
+	}
 	return (
 		<div className='h-full pt-16'>
 			<div className='container mx-auto px-4 py-8'>
@@ -55,7 +74,7 @@ export default async function HistoryPage() {
 						</div>
 
 						<div className='divide-y'>
-							{completions.map(completion => (
+							{completions.map((completion: LessonCompletion) => (
 								<div
 									key={completion._id}
 									className='grid grid-cols-[1fr,2fr,1fr] md:grid-cols-[1fr,2fr,1fr,1fr] p-4 items-center hover:bg-muted/30 transition-colors'

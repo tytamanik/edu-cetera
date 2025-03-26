@@ -1,4 +1,5 @@
 import { CourseCard } from '@/components/CourseCard'
+import { GetCoursesQueryResult } from '@/sanity.types'
 import { getCategories } from '@/sanity/lib/categories/getCategories'
 import { searchCourses } from '@/sanity/lib/courses/searchCourses'
 import {
@@ -8,11 +9,12 @@ import {
 	Code,
 	Compass,
 	Globe,
+	LucideProps,
 	PenTool,
 } from 'lucide-react'
 import Link from 'next/link'
 
-const categoryIcons = {
+const categoryIcons: Record<string, React.FC<LucideProps>> = {
 	Technology: Code,
 	Business: Briefcase,
 	Design: PenTool,
@@ -22,7 +24,6 @@ const categoryIcons = {
 	Entrepreneurship: Briefcase,
 	'Graphic Design': PenTool,
 	'Digital Marketing': Globe,
-
 	default: BookOpen,
 }
 
@@ -47,7 +48,7 @@ export default async function ExplorePage() {
 					const slugValue =
 						typeof category.slug === 'string'
 							? category.slug
-							: category.slug?.current || ''
+							: (category.slug as { current?: string })?.current || ''
 
 					return (
 						<Link
@@ -82,7 +83,7 @@ export default async function ExplorePage() {
 			<div>
 				<h2 className='text-2xl font-bold mb-6'>All Courses</h2>
 				<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-					{courses.map(course => (
+					{courses.map((course: GetCoursesQueryResult[number]) => (
 						<CourseCard
 							key={course._id}
 							course={course}

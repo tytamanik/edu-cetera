@@ -16,7 +16,20 @@ export default async function SubscriptionsPage() {
 	}
 
 	const instructors = await getSubscribedInstructors(user.id)
-
+	type SubscribedInstructor = {
+		_id: string
+		name: string
+		bio?: string
+		photo?: any
+		courseCount?: number
+		studentCount?: number
+		followerCount?: number
+		recentCourse?: string
+		recentCourseSlug?: string
+		recentCourseImage?: any
+		recentActivity?: string
+		recentCourseDate?: string
+	}
 	return (
 		<div className='h-full pt-16'>
 			<div className='container mx-auto px-4 py-8'>
@@ -52,7 +65,7 @@ export default async function SubscriptionsPage() {
 						</div>
 					) : (
 						<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
-							{instructors.map(instructor => (
+							{instructors.map((instructor: SubscribedInstructor) => (
 								<div
 									key={instructor._id}
 									className='bg-card rounded-lg border p-6 flex flex-col items-center text-center hover:shadow-md transition-all'
@@ -142,9 +155,12 @@ export default async function SubscriptionsPage() {
 					) : (
 						<div className='space-y-4'>
 							{instructors
-								.filter(instructor => instructor.recentCourseSlug)
+								.filter(
+									(instructor: SubscribedInstructor) =>
+										instructor.recentCourseSlug
+								)
 								.slice(0, 5)
-								.map(instructor => (
+								.map((instructor: SubscribedInstructor) => (
 									<div
 										key={`update-${instructor._id}`}
 										className='bg-card rounded-lg border p-4 hover:shadow-sm transition-all'
@@ -199,7 +215,10 @@ export default async function SubscriptionsPage() {
 																	src={urlFor(
 																		instructor.recentCourseImage
 																	).url()}
-																	alt={instructor.recentCourse}
+																	alt={
+																		(instructor as SubscribedInstructor)
+																			.recentCourse || 'New Course'
+																	}
 																	fill
 																	className='object-cover'
 																/>
@@ -224,7 +243,8 @@ export default async function SubscriptionsPage() {
 
 							{instructors.length > 0 &&
 								!instructors.some(
-									instructor => instructor.recentCourseSlug
+									(instructor: SubscribedInstructor) =>
+										instructor.recentCourseSlug
 								) && (
 									<div className='text-center py-8'>
 										<p className='text-muted-foreground'>

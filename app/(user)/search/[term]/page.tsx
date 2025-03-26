@@ -1,6 +1,7 @@
 import { CourseCard } from '@/components/CourseCard'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { GetCoursesQueryResult } from '@/sanity.types'
 import { getCategories } from '@/sanity/lib/categories/getCategories'
 import { CourseFilters } from '@/sanity/lib/courses/getAllCourses'
 import { searchCourses } from '@/sanity/lib/courses/searchCourses'
@@ -322,7 +323,7 @@ export default async function SearchPage({
 						</div>
 					) : (
 						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-							{courses.map(course => (
+							{courses.map((course: GetCoursesQueryResult[number]) => (
 								<CourseCard
 									key={course._id}
 									course={course}

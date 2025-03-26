@@ -1,6 +1,7 @@
 import { CourseCard } from '@/components/CourseCard'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
+import { GetCoursesQueryResult } from '@/sanity.types'
 import {
 	getFeaturedCourses,
 	getNewestCourses,
@@ -8,14 +9,21 @@ import {
 } from '@/sanity/lib/courses/getFeaturedCourses'
 import { BookOpen, Compass, GraduationCap, Star } from 'lucide-react'
 import Link from 'next/link'
-
 export const revalidate = 3600
 
 export default async function Home() {
 	const [featuredCourses, newestCourses, popularCategories] = await Promise.all(
 		[getFeaturedCourses(6), getNewestCourses(3), getPopularCategories(5)]
 	)
-
+	type CategoryWithCount = {
+		_id: string
+		name: string
+		slug: string
+		description?: string
+		color?: string
+		icon?: string
+		courseCount: number
+	}
 	return (
 		<div className='pb-20 sm:pb-6'>
 			<Hero />
@@ -38,7 +46,7 @@ export default async function Home() {
 
 				{featuredCourses.length > 0 ? (
 					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-						{featuredCourses.map(course => (
+						{featuredCourses.map((course: GetCoursesQueryResult[number]) => (
 							<CourseCard
 								key={course._id}
 								course={course}
@@ -72,7 +80,7 @@ export default async function Home() {
 
 					{popularCategories.length > 0 ? (
 						<div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8'>
-							{popularCategories.map(category => (
+							{popularCategories.map((category: CategoryWithCount) => (
 								<Link
 									key={category._id}
 									href={`/category/${category.slug}`}
@@ -131,7 +139,7 @@ export default async function Home() {
 
 				{newestCourses.length > 0 ? (
 					<div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-						{newestCourses.map(course => (
+						{newestCourses.map((course: GetCoursesQueryResult[number]) => (
 							<CourseCard
 								key={course._id}
 								course={course}

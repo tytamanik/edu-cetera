@@ -1,6 +1,7 @@
 import { CourseCard } from '@/components/CourseCard'
 import { FollowInstructorButton } from '@/components/FollowInstructorButton'
 import { Button } from '@/components/ui/button'
+import { GetCoursesQueryResult } from '@/sanity.types'
 import { urlFor } from '@/sanity/lib/image'
 import { getInstructorById } from '@/sanity/lib/instructor/getInstructorById'
 import { isFollowingInstructor } from '@/sanity/lib/instructor/isFollowingInstructor'
@@ -9,7 +10,6 @@ import { ArrowLeft, BookOpen, GraduationCap } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-
 interface InstructorProfilePageProps {
 	params: {
 		id: string
@@ -124,13 +124,15 @@ export default async function InstructorProfilePage({
 						</div>
 					) : (
 						<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-							{instructor.courses.map(course => (
-								<CourseCard
-									key={course._id}
-									course={course}
-									href={`/courses/${course.slug}`}
-								/>
-							))}
+							{instructor.courses.map(
+								(course: GetCoursesQueryResult[number]) => (
+									<CourseCard
+										key={course._id}
+										course={course}
+										href={`/courses/${course.slug}`}
+									/>
+								)
+							)}
 						</div>
 					)}
 				</div>
