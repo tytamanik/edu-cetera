@@ -287,47 +287,54 @@ export async function deleteCourseAction(courseId: string, userId: string) {
 
 		// Get all modules to delete them too
 		const modules = await client.fetch(
-			`*[_type == "course" && _id == $courseId][0].modules[]._ref`
+			`*[_type == "course" && _id == $courseId][0].modules[]._ref`,
+			{ courseId }
 		)
 
 		if (modules && modules.length > 0) {
-			// Process each module one by one
 			for (const moduleId of modules) {
-				// Get lessons of this module
 				const lessons = await client.fetch(
-					`*[_type == "module" && _id == $moduleId][0].lessons[]._ref`
+					`*[_type == "module" && _id == $moduleId][0].lessons[]._ref`,
+					{ moduleId }
 				)
 
-				// Delete lessons if they exist
 				if (lessons && lessons.length > 0) {
 					for (const lessonId of lessons) {
-						// Delete lesson completions first
-						await client.delete({
-							query: `*[_type == "lessonCompletion" && lesson._ref == $lessonId]`,
-							params: { lessonId },
-						})
-
-						// Then delete the lesson
+						// Delete lesson completions
+						const completionIds = await client.fetch(
+							`*[_type == "lessonCompletion" && lesson._ref == $lessonId]._id`,
+							{ lessonId }
+						)
+						for (const id of completionIds) {
+							await client.delete(id)
+						}
+						// Delete the lesson
 						await client.delete(lessonId)
 					}
 				}
 
-				// Now delete the module
+				// Delete the module
 				await client.delete(moduleId)
 			}
 		}
 
 		// Delete enrollments
-		await client.delete({
-			query: `*[_type == "enrollment" && course._ref == $courseId]`,
-			params: { courseId },
-		})
+		const enrollmentIds = await client.fetch(
+			`*[_type == "enrollment" && course._ref == $courseId]._id`,
+			{ courseId }
+		)
+		for (const id of enrollmentIds) {
+			await client.delete(id)
+		}
 
 		// Delete bookmarks
-		await client.delete({
-			query: `*[_type == "bookmark" && course._ref == $courseId]`,
-			params: { courseId },
-		})
+		const bookmarkIds = await client.fetch(
+			`*[_type == "bookmark" && course._ref == $courseId]._id`,
+			{ courseId }
+		)
+		for (const id of bookmarkIds) {
+			await client.delete(id)
+		}
 
 		// Finally delete the course itself
 		await client.delete(courseId)

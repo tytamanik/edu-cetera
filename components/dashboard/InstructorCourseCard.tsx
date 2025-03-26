@@ -40,7 +40,6 @@ export default function InstructorCourseCard({
 	course,
 }: InstructorCourseCardProps) {
 	const isPublished = !!course.published
-	const courseSlug = course.slug?.current || ''
 	const [imageError, setImageError] = useState(false)
 	const [isImageLoading, setIsImageLoading] = useState(true)
 
