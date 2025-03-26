@@ -11,14 +11,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-export default async function InstructorProfilePage({
-	params,
-}: {
-	params: Promise<{ id: string }> | { id: string }
-}) {
-	const resolvedParams = params instanceof Promise ? await params : params
-	const { id } = resolvedParams
-
+export default async function InstructorProfilePage(props: any) {
+	const { params } = props
+	const { id } = params
 	const user = await currentUser()
 
 	const [instructor, isFollowing] = await Promise.all([
