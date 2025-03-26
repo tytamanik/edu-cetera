@@ -12,26 +12,21 @@ import Link from 'next/link'
 export const dynamic = 'force-dynamic'
 
 export default async function CoursesPage({
-	searchParams,
+	searchParams = {},
 }: {
-	params?: any
-	searchParams:
-		| Promise<{ [key: string]: string | string[] | undefined }>
-		| { [key: string]: string | string[] | undefined }
+	searchParams?: { [key: string]: string | string[] | undefined }
 }) {
-	const resolvedParams =
-		searchParams instanceof Promise ? await searchParams : searchParams
-
-	const sort = (resolvedParams.sort as string) || 'popular'
-	const categoryParam = resolvedParams.category as string | string[]
+	const sort = (searchParams.sort as string) || 'popular'
+	const categoryParam = searchParams.category as string | string[]
 	const categories = Array.isArray(categoryParam)
 		? categoryParam
 		: categoryParam
 			? [categoryParam]
 			: []
-	const isFree = resolvedParams.free === 'true'
-	const isPaid = resolvedParams.paid === 'true'
-	const priceRange = resolvedParams.priceRange as string
+	const isFree = searchParams.free === 'true'
+	const isPaid = searchParams.paid === 'true'
+	const priceRange = searchParams.priceRange as string
+
 	let priceRangeFilter = undefined
 	if (priceRange) {
 		const [min, max] = priceRange.split('-').map(Number)
