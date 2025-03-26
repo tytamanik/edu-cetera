@@ -17,7 +17,6 @@ import { CheckCircle2, Edit2, Lock } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
-import CoursePreviewButton from './CoursePreviewButton'
 
 interface Course {
 	_id: string
@@ -126,9 +125,7 @@ export default function InstructorCourseCard({
 				</div>
 			</CardContent>
 
-			<CardFooter className='grid grid-cols-2 gap-2 pt-2 mt-auto'>
-				<CoursePreviewButton slug={courseSlug} variant='outline' size='sm' />
-
+			<CardFooter className='grid grid-cols-1  pt-2 mt-auto'>
 				<Button asChild variant='default' size='sm'>
 					<Link
 						href={`/creator-dashboard/courses/${course._id}/edit`}

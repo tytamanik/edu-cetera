@@ -5,6 +5,7 @@ import { client } from '@/sanity/lib/adminClient'
 import { getCategoryIdBySlug } from '@/sanity/lib/categories/getCategoryIdBySlug'
 import { getInstructorByClerkId } from '@/sanity/lib/instructor/getInstructorByClerkId'
 import { isUserInstructor } from '@/sanity/lib/instructor/isUserInstructor'
+import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 
 export async function createCourseAction(formData: FormData) {
@@ -44,7 +45,7 @@ export async function createCourseAction(formData: FormData) {
 			}
 		}
 
-		let categoryId = await getCategoryIdBySlug(categorySlug)
+		const categoryId = await getCategoryIdBySlug(categorySlug)
 		if (!categoryId) {
 			return {
 				success: false,
@@ -383,10 +384,10 @@ export async function uploadCourseImageAction(formData: FormData) {
 			return { success: false, error: 'Missing image or course ID' }
 		}
 
-		// Ensure user has permission to update this course
-		const userId = formData.get('userId') as string
+		// Get the user from Clerk authentication
+		const { userId } = await auth()
 
-		// If userId is not provided in formData, we cannot verify permission
+		// If no authenticated user, return an error
 		if (!userId) {
 			return { success: false, error: 'User authentication required' }
 		}

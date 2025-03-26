@@ -2,7 +2,6 @@
 'use client'
 
 import { uploadCourseImageAction } from '@/app/actions/courseActions'
-import { useUser } from '@clerk/nextjs'
 import { ImageIcon, UploadCloud, X } from 'lucide-react'
 import Image from 'next/image'
 import { useRef, useState } from 'react'
@@ -24,7 +23,6 @@ export default function ImageUpload({
 	const [imageUrl, setImageUrl] = useState<string | null>(initialImage || null)
 	const [error, setError] = useState<string | null>(null)
 	const fileInputRef = useRef<HTMLInputElement>(null)
-	const { user } = useUser()
 
 	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0]
