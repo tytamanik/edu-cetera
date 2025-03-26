@@ -4,11 +4,11 @@ import { getCourseCurriculum } from '@/sanity/lib/courses/getCourseCurriculum'
 import { getCourseForEditing } from '@/sanity/lib/courses/getCourseForEditing'
 import { currentUser } from '@clerk/nextjs/server'
 import { ArrowLeft } from 'lucide-react'
+import type { PageProps } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
-const CourseContentPage = async (props: any) => {
-	const { params } = props
+export default async function CourseContentPage({ params }: PageProps) {
 	const user = await currentUser()
 
 	if (!user?.id) {
@@ -51,5 +51,3 @@ const CourseContentPage = async (props: any) => {
 		return redirect('/creator-dashboard')
 	}
 }
-
-export default CourseContentPage
