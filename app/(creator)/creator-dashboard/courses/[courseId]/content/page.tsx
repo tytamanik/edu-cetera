@@ -7,8 +7,16 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
-const CourseContentPage = async (props: any) => {
-	const { params } = props
+interface PageParams {
+	params: {
+		courseId: string
+	}
+	searchParams?: Record<string, string | string[] | undefined>
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - Ignore the PageProps constraint
+const CourseContentPage = async ({ params }: PageParams) => {
 	const user = await currentUser()
 
 	if (!user?.id) {
