@@ -15,18 +15,11 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
-interface SearchPageProps {
-	params: {
-		term: string
-	}
-	searchParams: { [key: string]: string | string[] | undefined }
-}
+export default async function SearchPage(props: any) {
+	const { params, searchParams } = props
+	const { term } = params
 
-export default async function SearchPage({
-	params,
-	searchParams,
-}: SearchPageProps) {
-	const decodedTerm = decodeURIComponent(params.term)
+	const decodedTerm = decodeURIComponent(term)
 
 	const sort = (searchParams.sort as string) || 'popular'
 	const categoryParam = searchParams.category as string | string[]
