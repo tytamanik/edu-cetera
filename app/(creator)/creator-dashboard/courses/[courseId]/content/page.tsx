@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import CourseContentEditor from '@/components/dashboard/CourseContentEditor'
 import { Button } from '@/components/ui/button'
 import { getCourseCurriculum } from '@/sanity/lib/courses/getCourseCurriculum'
@@ -8,15 +7,15 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
-export default async function CourseContentPage(props: any) {
+const CourseContentPage = async (props: any) => {
 	const { params } = props
-	const courseId = params.courseId
-
 	const user = await currentUser()
 
 	if (!user?.id) {
 		return redirect('/')
 	}
+
+	const courseId = params.courseId
 
 	try {
 		const course = await getCourseForEditing(courseId, user.id)
@@ -52,3 +51,5 @@ export default async function CourseContentPage(props: any) {
 		return redirect('/creator-dashboard')
 	}
 }
+
+export default CourseContentPage
