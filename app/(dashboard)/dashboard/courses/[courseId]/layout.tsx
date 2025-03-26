@@ -1,46 +1,46 @@
-import { redirect } from "next/navigation";
-import { currentUser } from "@clerk/nextjs/server";
-import getCourseById from "@/sanity/lib/courses/getCourseById";
-import { Sidebar } from "@/components/dashboard/Sidebar";
-import { getCourseProgress } from "@/sanity/lib/lessons/getCourseProgress";
-import { checkCourseAccess } from "@/lib/auth";
+import { Sidebar } from '@/components/dashboard/Sidebar'
+import { checkCourseAccess } from '@/lib/auth'
+import getCourseById from '@/sanity/lib/courses/getCourseById'
+import { getCourseProgress } from '@/sanity/lib/lessons/getCourseProgress'
+import { currentUser } from '@clerk/nextjs/server'
+import { redirect } from 'next/navigation'
 
 interface CourseLayoutProps {
-  children: React.ReactNode;
-  params: Promise<{
-    courseId: string;
-  }>;
+	children: React.ReactNode
+	params: {
+		courseId: string
+	}
 }
 
 export default async function CourseLayout({
-  children,
-  params,
+	children,
+	params,
 }: CourseLayoutProps) {
-  const user = await currentUser();
-  const { courseId } = await params;
+	const user = await currentUser()
+	const { courseId } = params
 
-  if (!user?.id) {
-    return redirect("/");
-  }
+	if (!user?.id) {
+		return redirect('/')
+	}
 
-  const authResult = await checkCourseAccess(user?.id || null, courseId);
-  if (!authResult.isAuthorized || !user?.id) {
-    return redirect(authResult.redirect!);
-  }
+	const authResult = await checkCourseAccess(user?.id || null, courseId)
+	if (!authResult.isAuthorized || !user?.id) {
+		return redirect(authResult.redirect!)
+	}
 
-  const [course, progress] = await Promise.all([
-    getCourseById(courseId),
-    getCourseProgress(user.id, courseId),
-  ]);
+	const [course, progress] = await Promise.all([
+		getCourseById(courseId),
+		getCourseProgress(user.id, courseId),
+	])
 
-  if (!course) {
-    return redirect("/my-courses");
-  }
+	if (!course) {
+		return redirect('/my-courses')
+	}
 
-  return (
-    <div className="h-full">
-      <Sidebar course={course} completedLessons={progress.completedLessons} />
-      <main className="h-full lg:pt-[64px] pl-20 lg:pl-96">{children}</main>
-    </div>
-  );
+	return (
+		<div className='h-full'>
+			<Sidebar course={course} completedLessons={progress.completedLessons} />
+			<main className='h-full lg:pt-[64px] pl-20 lg:pl-96'>{children}</main>
+		</div>
+	)
 }

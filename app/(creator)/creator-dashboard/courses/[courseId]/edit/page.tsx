@@ -40,7 +40,7 @@ export default async function CourseEditPage({ params }: CourseEditPageProps) {
 				<div className='max-w-3xl mx-auto'>
 					<h1 className='text-3xl font-bold mb-8'>Edit Course</h1>
 
-					<CourseForm mode='edit' courseId={courseId} initialData={course} />
+					<CourseForm courseId={courseId} initialData={course} />
 				</div>
 			</div>
 		)
