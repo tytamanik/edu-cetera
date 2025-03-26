@@ -14,9 +14,11 @@ import { notFound } from 'next/navigation'
 export default async function InstructorProfilePage({
 	params,
 }: {
-	params: { id: string }
+	params: Promise<{ id: string }> | { id: string }
 }) {
-	const { id } = params
+	const resolvedParams = params instanceof Promise ? await params : params
+	const { id } = resolvedParams
+
 	const user = await currentUser()
 
 	const [instructor, isFollowing] = await Promise.all([
