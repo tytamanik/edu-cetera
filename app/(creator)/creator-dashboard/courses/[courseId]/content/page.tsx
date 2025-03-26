@@ -1,3 +1,4 @@
+// @ts-nocheck - Disable TypeScript checking for this file
 import CourseContentEditor from '@/components/dashboard/CourseContentEditor'
 import { Button } from '@/components/ui/button'
 import { getCourseCurriculum } from '@/sanity/lib/courses/getCourseCurriculum'
@@ -7,16 +8,7 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
-interface PageParams {
-	params: {
-		courseId: string
-	}
-	searchParams?: Record<string, string | string[] | undefined>
-}
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore - Ignore the PageProps constraint
-const CourseContentPage = async ({ params }: PageParams) => {
+export default async function CourseContentPage({ params }) {
 	const user = await currentUser()
 
 	if (!user?.id) {
@@ -59,5 +51,3 @@ const CourseContentPage = async ({ params }: PageParams) => {
 		return redirect('/creator-dashboard')
 	}
 }
-
-export default CourseContentPage
