@@ -33,7 +33,7 @@ interface Lesson {
 	description?: string
 	videoUrl?: string
 	loomUrl?: string
-	content?: any[]
+	content?: unknown[]
 	isNew?: boolean
 }
 
@@ -265,8 +265,8 @@ export default function ModuleEditor({
 					<AlertDialogHeader>
 						<AlertDialogTitle>Are you sure?</AlertDialogTitle>
 						<AlertDialogDescription>
-							This will delete the module "{module.title}" and all its lessons.
-							This action cannot be undone.
+							This will delete the module &ldquo;{module.title}&rdquo; and all
+							its lessons. This action cannot be undone.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>

@@ -59,6 +59,7 @@ export default function LessonEditor({
 				slug: { current: generateSlug(prev.title) },
 			}))
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [formState.title])
 
 	const handleInputChange = (

@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface NavItemProps {
 	href: string
@@ -74,11 +74,15 @@ export function SidebarNav() {
 	>('collapsed')
 
 	let sidebarState = localSidebarState
-	let toggleSidebar = () =>
-		setLocalSidebarState(prev =>
-			prev === 'expanded' ? 'collapsed' : 'expanded'
-		)
-	let hideSidebar = () => setLocalSidebarState('hidden')
+	let toggleSidebar = useCallback(
+		() =>
+			setLocalSidebarState(prev =>
+				prev === 'expanded' ? 'collapsed' : 'expanded'
+			),
+		[]
+	)
+
+	let hideSidebar = useCallback(() => setLocalSidebarState('hidden'), [])
 
 	try {
 		const context = useSidebar()
