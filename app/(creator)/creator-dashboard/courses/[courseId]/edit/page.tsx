@@ -1,3 +1,4 @@
+// Course Edit Page
 import CourseForm from '@/components/dashboard/CourseForm'
 import { Button } from '@/components/ui/button'
 import { getCourseForEditing } from '@/sanity/lib/courses/getCourseForEditing'
@@ -6,10 +7,10 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
-interface CourseEditPageProps {
-	params: {
+export interface CourseEditPageProps {
+	params: Promise<{
 		courseId: string
-	}
+	}>
 }
 
 export default async function CourseEditPage({ params }: CourseEditPageProps) {
@@ -19,7 +20,7 @@ export default async function CourseEditPage({ params }: CourseEditPageProps) {
 		return redirect('/')
 	}
 
-	const courseId = params.courseId
+	const { courseId } = await params
 
 	try {
 		const course = await getCourseForEditing(courseId, user.id)
