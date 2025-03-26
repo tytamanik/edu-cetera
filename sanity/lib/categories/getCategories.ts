@@ -1,5 +1,5 @@
-import { defineQuery } from 'groq'
-import { sanityFetch } from '../live'
+// File: sanity/lib/categories/getCategories.ts
+import { client } from '../client'
 
 export interface Category {
 	_id: string
@@ -12,19 +12,21 @@ export interface Category {
 	color?: string
 }
 
-export async function getCategories() {
-	const getCategoriesQuery = defineQuery(`*[_type == "category"] {
+export async function getCategories(): Promise<Category[]> {
+	const query = `*[_type == "category"] {
     _id,
     name,
     "slug": slug.current,
     description,
     icon,
     color
-  }`)
+  }`
 
-	const result = await sanityFetch({
-		query: getCategoriesQuery,
-	})
-
-	return result.data || []
+	try {
+		const categories = await client.fetch<Category[]>(query)
+		return categories || []
+	} catch (error) {
+		console.error('Error fetching categories:', error)
+		return []
+	}
 }
