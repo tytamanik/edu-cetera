@@ -83,15 +83,7 @@ export default async function Home() {
 									prefetch={false}
 									className='flex flex-col items-center justify-center p-6 rounded-lg bg-background border hover:shadow-md transition-all hover:border-primary'
 								>
-									<div
-										className='w-16 h-16 rounded-full flex items-center justify-center mb-4'
-										style={{
-											backgroundColor: category.color
-												? `${category.color}20`
-												: '#f0f0f0',
-											color: category.color || 'currentColor',
-										}}
-									>
+									<div className='p-4 bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mb-4'>
 										{category.icon ? (
 											<span className='text-2xl'>{category.icon}</span>
 										) : (

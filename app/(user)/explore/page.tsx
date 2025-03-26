@@ -45,10 +45,19 @@ export default async function ExplorePage() {
 					const CategoryIcon =
 						categoryIcons[category.name] || categoryIcons['default']
 
+					// Debug log to see what we're working with
+					console.log(`Category ${category.name} slug:`, category.slug)
+
+					// Ensure slug is properly accessed
+					const slugValue =
+						typeof category.slug === 'string'
+							? category.slug
+							: category.slug?.current || ''
+
 					return (
 						<Link
 							key={category._id}
-							href={`/category/${category.slug.current}`}
+							href={`/category/${slugValue}`}
 							className='group'
 						>
 							<div className='bg-card border rounded-lg p-4 hover:shadow-md transition-all hover:border-primary/50 hover:bg-muted/20'>

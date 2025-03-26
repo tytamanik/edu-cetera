@@ -7,13 +7,13 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 interface CategoryPageProps {
-	params: Promise<{
+	params: {
 		slug: string
-	}>
+	}
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
-	const { slug } = await params
+	const { slug } = params
 	const [category, courses] = await Promise.all([
 		getCategoryBySlug(slug),
 		getCoursesByCategory(slug),
