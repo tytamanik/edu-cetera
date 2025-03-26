@@ -1,4 +1,4 @@
-// @ts-nocheck - Disable TypeScript checking for this file
+// @ts-nocheck
 import CourseContentEditor from '@/components/dashboard/CourseContentEditor'
 import { Button } from '@/components/ui/button'
 import { getCourseCurriculum } from '@/sanity/lib/courses/getCourseCurriculum'
