@@ -1,4 +1,3 @@
-// @ts-nocheck
 import CourseContentEditor from '@/components/dashboard/CourseContentEditor'
 import { Button } from '@/components/ui/button'
 import { getCourseCurriculum } from '@/sanity/lib/courses/getCourseCurriculum'
@@ -8,7 +7,15 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
-export default async function CourseContentPage({ params }) {
+interface CourseContentPageProps {
+	params: {
+		courseId: string
+	}
+}
+
+export default async function CourseContentPage({
+	params,
+}: CourseContentPageProps) {
 	const user = await currentUser()
 
 	if (!user?.id) {
