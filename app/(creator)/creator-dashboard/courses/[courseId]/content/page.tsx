@@ -1,24 +1,39 @@
+import { currentUser } from '@clerk/nextjs/server'
+import { Metadata } from 'next'
+import { redirect } from 'next/navigation'
+
 import CourseContentEditor from '@/components/dashboard/CourseContentEditor'
 import { Button } from '@/components/ui/button'
 import { getCourseCurriculum } from '@/sanity/lib/courses/getCourseCurriculum'
 import { getCourseForEditing } from '@/sanity/lib/courses/getCourseForEditing'
-import { currentUser } from '@clerk/nextjs/server'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 
-const CourseContentPage = async (props: any) => {
-	const { params } = props
+interface CourseContentPageProps {
+	params: {
+		courseId: string
+	}
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+	return {
+		title: 'Edit Course Content',
+	}
+}
+
+export default async function CourseContentPage({
+	params,
+}: CourseContentPageProps) {
 	const user = await currentUser()
-
 	if (!user?.id) {
 		return redirect('/')
 	}
 
-	const courseId = params.courseId
+	const { courseId } = params
 
 	try {
 		const course = await getCourseForEditing(courseId, user.id)
+
 		const curriculum = await getCourseCurriculum(courseId)
 
 		return (
@@ -41,15 +56,19 @@ const CourseContentPage = async (props: any) => {
 
 					<CourseContentEditor
 						courseId={courseId}
-						initialCurriculum={curriculum}
+						initialCurriculum={{
+							_id: courseId,
+							title: course.title || 'Untitled Course',
+							modules: curriculum.modules || [],
+						}}
 					/>
 				</div>
 			</div>
 		)
 	} catch (error) {
-		console.error('Error loading course:', error)
+		console.error('Error loading course content:', error)
 		return redirect('/creator-dashboard')
 	}
 }
 
-export default CourseContentPage
+export const dynamic = 'force-dynamic'
