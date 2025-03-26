@@ -57,10 +57,6 @@ export default async function CoursesPage({
 	const getFilterUrl = (
 		params: Record<string, string | string[] | boolean | null>
 	) => {
-		const url = new URL(
-			typeof window !== 'undefined' ? window.location.href : 'http://localhost'
-		)
-
 		const urlParams = new URLSearchParams()
 
 		if (sort) {
