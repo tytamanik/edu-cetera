@@ -99,7 +99,7 @@ export async function updateCourseAction(formData: FormData) {
 		const price = Number(formData.get('price')) || 0
 		const published = formData.get('published') === 'true'
 
-		const updates: Record<string, any> = {}
+		const updates: Record<string, unknown> = {}
 
 		if (title) updates.title = title
 		if (description) updates.description = description
@@ -199,36 +199,42 @@ export async function deleteCourseAction(courseId: string) {
 	}
 }
 
-export async function updateCourseCurriculumAction(data: {
+interface Lesson {
+	_id?: string
+	_key?: string
+	title: string
+	slug?: { current: string }
+	description?: string
+	videoUrl?: string
+	loomUrl?: string
+	content?: unknown[]
+	isNew?: boolean
+}
+
+interface CourseModule {
+	_id?: string
+	_key?: string
+	title: string
+	isNew?: boolean
+	lessons: Lesson[]
+}
+
+interface CurriculumData {
 	courseId: string
-	modules: {
-		_id?: string
-		_key?: string
-		title: string
-		isNew?: boolean
-		lessons: {
-			_id?: string
-			_key?: string
-			title: string
-			slug?: { current: string }
-			description?: string
-			videoUrl?: string
-			loomUrl?: string
-			content?: any[]
-			isNew?: boolean
-		}[]
-	}[]
-}) {
+	modules: CourseModule[]
+}
+
+export async function updateCourseCurriculumAction(data: CurriculumData) {
 	try {
 		const { courseId, modules } = data
 
-		for (const module of modules) {
-			let moduleId = module._id
+		for (const courseModule of modules) {
+			let moduleId = courseModule._id
 
-			if (module.isNew || !moduleId) {
+			if (courseModule.isNew || !moduleId) {
 				const newModule = await client.create({
 					_type: 'module',
-					title: module.title,
+					title: courseModule.title,
 				})
 
 				moduleId = newModule._id
@@ -236,14 +242,14 @@ export async function updateCourseCurriculumAction(data: {
 				await client
 					.patch(moduleId)
 					.set({
-						title: module.title,
+						title: courseModule.title,
 					})
 					.commit()
 			}
 
 			const lessonRefs = []
 
-			for (const lesson of module.lessons) {
+			for (const lesson of courseModule.lessons) {
 				let lessonId = lesson._id
 
 				if (lesson.isNew || !lessonId) {
@@ -299,7 +305,7 @@ export async function updateCourseCurriculumAction(data: {
 				})
 				.append('modules', [
 					{
-						_key: module._key || moduleId,
+						_key: courseModule._key || moduleId,
 						_type: 'reference',
 						_ref: moduleId,
 					},
@@ -315,7 +321,9 @@ export async function updateCourseCurriculumAction(data: {
 		)
 
 		if (currentCourse?.modules) {
-			const currentModuleIds = currentCourse.modules.map((m: any) => m._id)
+			const currentModuleIds = currentCourse.modules.map(
+				(m: { _id: string }) => m._id
+			)
 			const newModuleIds = modules.filter(m => m._id).map(m => m._id)
 
 			const modulesToRemove = currentModuleIds.filter(
@@ -329,7 +337,8 @@ export async function updateCourseCurriculumAction(data: {
 				)
 
 				const updatedModules = currentModulesArray.filter(
-					(moduleRef: any) => !modulesToRemove.includes(moduleRef._ref)
+					(moduleRef: { _ref: string }) =>
+						!modulesToRemove.includes(moduleRef._ref)
 				)
 
 				await client

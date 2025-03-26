@@ -29,16 +29,11 @@ interface Course {
 }
 
 interface CourseFormProps {
-	mode: 'create' | 'edit'
 	courseId?: string
 	initialData?: Course
 }
 
-export default function CourseForm({
-	mode,
-	courseId,
-	initialData,
-}: CourseFormProps) {
+export default function CourseForm({ courseId, initialData }: CourseFormProps) {
 	const router = useRouter()
 	const { user } = useUser()
 	const [isPending, startTransition] = useTransition()

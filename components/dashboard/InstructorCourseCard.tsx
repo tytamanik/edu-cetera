@@ -23,7 +23,11 @@ interface Course {
 	price?: number
 	slug?: { current?: string }
 	published?: boolean
-	image?: any
+	image?: {
+		asset?: {
+			_ref: string
+		}
+	}
 }
 
 interface InstructorCourseCardProps {

@@ -23,7 +23,7 @@ interface Lesson {
 	description?: string
 	videoUrl?: string
 	loomUrl?: string
-	content?: any[]
+	content?: unknown[]
 	isNew?: boolean
 }
 

@@ -29,7 +29,7 @@ interface Lesson {
 	description?: string
 	videoUrl?: string
 	loomUrl?: string
-	content?: any[]
+	content?: unknown[]
 	isNew?: boolean
 }
 
@@ -150,14 +150,6 @@ export default function CourseContentEditor({
 				setError('An unexpected error occurred')
 			}
 		})
-	}
-
-	const toggleModule = (moduleKey: string) => {
-		setExpandedModules(prevExpanded =>
-			prevExpanded.includes(moduleKey)
-				? prevExpanded.filter(key => key !== moduleKey)
-				: [...prevExpanded, moduleKey]
-		)
 	}
 
 	return (

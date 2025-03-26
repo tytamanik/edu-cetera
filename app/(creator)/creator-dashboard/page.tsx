@@ -19,10 +19,9 @@ export default async function CreatorDashboardPage() {
 			name?: string
 			courses?: Course[]
 		} | null
-		error?: string
 	}
 
-	const { success, instructor, error } = (await getInstructorProfileAction(
+	const { success, instructor } = (await getInstructorProfileAction(
 		user.id
 	)) as InstructorProfileResponse
 
@@ -42,7 +41,6 @@ export default async function CreatorDashboardPage() {
 	const publishedCourses = courses.filter(
 		(course: Course) => course.published
 	).length
-	const draftCourses = totalCourses - publishedCourses
 
 	return (
 		<div className='container mx-auto px-4 py-8 mt-16'>
