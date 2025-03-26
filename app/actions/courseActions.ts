@@ -1,8 +1,10 @@
+// File: app/actions/courseActions.ts
 'use server'
 
 import { client } from '@/sanity/lib/adminClient'
 import { getCategoryIdBySlug } from '@/sanity/lib/categories/getCategoryIdBySlug'
 import { getInstructorByClerkId } from '@/sanity/lib/instructor/getInstructorByClerkId'
+import { isUserInstructor } from '@/sanity/lib/instructor/isUserInstructor'
 import { revalidatePath } from 'next/cache'
 
 export async function createCourseAction(formData: FormData) {
@@ -22,6 +24,15 @@ export async function createCourseAction(formData: FormData) {
 			return { success: false, error: 'User not authenticated' }
 		}
 
+		// Check if user is an instructor
+		const isInstructor = await isUserInstructor(userId)
+		if (!isInstructor) {
+			return {
+				success: false,
+				error: 'You must be registered as an instructor to create courses',
+			}
+		}
+
 		const instructorResult = await getInstructorByClerkId(userId)
 		const instructor = instructorResult.data
 
@@ -35,15 +46,10 @@ export async function createCourseAction(formData: FormData) {
 
 		let categoryId = await getCategoryIdBySlug(categorySlug)
 		if (!categoryId) {
-			const newCategory = await client.create({
-				_type: 'category',
-				name: categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1),
-				slug: {
-					_type: 'slug',
-					current: categorySlug,
-				},
-			})
-			categoryId = newCategory._id
+			return {
+				success: false,
+				error: 'Category not found. Please select a valid category.',
+			}
 		}
 
 		const course = await client.create({
@@ -98,6 +104,32 @@ export async function updateCourseAction(formData: FormData) {
 		const categorySlug = formData.get('category') as string
 		const price = Number(formData.get('price')) || 0
 		const published = formData.get('published') === 'true'
+		const userId = formData.get('userId') as string
+
+		if (!userId) {
+			return { success: false, error: 'User not authenticated' }
+		}
+
+		// Check if this is user's course
+		const instructorResult = await getInstructorByClerkId(userId)
+		const instructor = instructorResult.data
+
+		if (!instructor) {
+			return { success: false, error: 'Instructor profile not found' }
+		}
+
+		// Check if course exists and belongs to this instructor
+		const courseExists = await client.fetch(
+			`*[_type == "course" && _id == $courseId && instructor._ref == $instructorId][0]._id`,
+			{ courseId, instructorId: instructor._id }
+		)
+
+		if (!courseExists) {
+			return {
+				success: false,
+				error: 'Course not found or you do not have permission to edit it',
+			}
+		}
 
 		const updates: Record<string, unknown> = {}
 
@@ -113,6 +145,11 @@ export async function updateCourseAction(formData: FormData) {
 					_type: 'reference',
 					_ref: categoryId,
 				}
+			} else {
+				return {
+					success: false,
+					error: 'Category not found. Please select a valid category.',
+				}
 			}
 		}
 
@@ -120,7 +157,9 @@ export async function updateCourseAction(formData: FormData) {
 
 		revalidatePath('/creator-dashboard')
 		revalidatePath(`/creator-dashboard/courses/${courseId}/edit`)
+		revalidatePath(`/creator-dashboard/courses/${courseId}/content`)
 		revalidatePath('/courses')
+		revalidatePath(`/courses/[slug]`)
 
 		return {
 			success: true,
@@ -135,13 +174,34 @@ export async function updateCourseAction(formData: FormData) {
 	}
 }
 
-export async function publishCourseAction(courseId: string) {
+export async function publishCourseAction(courseId: string, userId: string) {
 	try {
+		const instructorResult = await getInstructorByClerkId(userId)
+
+		if (!instructorResult.data) {
+			return { success: false, error: 'Instructor profile not found' }
+		}
+
+		const instructorId = instructorResult.data._id
+
+		// Verify course belongs to instructor
+		const courseExists = await client.fetch(
+			`*[_type == "course" && _id == $courseId && instructor._ref == $instructorId][0]._id`,
+			{ courseId, instructorId }
+		)
+
+		if (!courseExists) {
+			return {
+				success: false,
+				error: 'Course not found or you do not have permission to publish it',
+			}
+		}
+
 		await client.patch(courseId).set({ published: true }).commit()
 
 		revalidatePath('/creator-dashboard')
 		revalidatePath(`/creator-dashboard/courses/${courseId}/edit`)
-		revalidatePath('/courses')
+		revalidatePath(`/courses`)
 
 		return {
 			success: true,
@@ -157,13 +217,34 @@ export async function publishCourseAction(courseId: string) {
 	}
 }
 
-export async function unpublishCourseAction(courseId: string) {
+export async function unpublishCourseAction(courseId: string, userId: string) {
 	try {
+		const instructorResult = await getInstructorByClerkId(userId)
+
+		if (!instructorResult.data) {
+			return { success: false, error: 'Instructor profile not found' }
+		}
+
+		const instructorId = instructorResult.data._id
+
+		// Verify course belongs to instructor
+		const courseExists = await client.fetch(
+			`*[_type == "course" && _id == $courseId && instructor._ref == $instructorId][0]._id`,
+			{ courseId, instructorId }
+		)
+
+		if (!courseExists) {
+			return {
+				success: false,
+				error: 'Course not found or you do not have permission to unpublish it',
+			}
+		}
+
 		await client.patch(courseId).set({ published: false }).commit()
 
 		revalidatePath('/creator-dashboard')
 		revalidatePath(`/creator-dashboard/courses/${courseId}/edit`)
-		revalidatePath('/courses')
+		revalidatePath(`/courses`)
 
 		return {
 			success: true,
@@ -179,12 +260,81 @@ export async function unpublishCourseAction(courseId: string) {
 	}
 }
 
-export async function deleteCourseAction(courseId: string) {
+export async function deleteCourseAction(courseId: string, userId: string) {
 	try {
+		// Verify the user is an instructor
+		const instructorResult = await getInstructorByClerkId(userId)
+
+		if (!instructorResult?.data?._id) {
+			return { success: false, error: 'Instructor profile not found' }
+		}
+
+		const instructorId = instructorResult.data._id
+
+		// Verify course belongs to instructor
+		const courseExists = await client.fetch(
+			`*[_type == "course" && _id == $courseId && instructor._ref == $instructorId][0]._id`,
+			{ courseId, instructorId }
+		)
+
+		if (!courseExists) {
+			return {
+				success: false,
+				error: 'Course not found or you do not have permission to delete it',
+			}
+		}
+
+		// Get all modules to delete them too
+		const modules = await client.fetch(
+			`*[_type == "course" && _id == $courseId][0].modules[]._ref`
+		)
+
+		if (modules && modules.length > 0) {
+			// Process each module one by one
+			for (const moduleId of modules) {
+				// Get lessons of this module
+				const lessons = await client.fetch(
+					`*[_type == "module" && _id == $moduleId][0].lessons[]._ref`
+				)
+
+				// Delete lessons if they exist
+				if (lessons && lessons.length > 0) {
+					for (const lessonId of lessons) {
+						// Delete lesson completions first
+						await client.delete({
+							query: `*[_type == "lessonCompletion" && lesson._ref == $lessonId]`,
+							params: { lessonId },
+						})
+
+						// Then delete the lesson
+						await client.delete(lessonId)
+					}
+				}
+
+				// Now delete the module
+				await client.delete(moduleId)
+			}
+		}
+
+		// Delete enrollments
+		await client.delete({
+			query: `*[_type == "enrollment" && course._ref == $courseId]`,
+			params: { courseId },
+		})
+
+		// Delete bookmarks
+		await client.delete({
+			query: `*[_type == "bookmark" && course._ref == $courseId]`,
+			params: { courseId },
+		})
+
+		// Finally delete the course itself
 		await client.delete(courseId)
 
+		// Revalidate necessary paths
 		revalidatePath('/creator-dashboard')
 		revalidatePath('/courses')
+		revalidatePath('/my-courses')
 
 		return {
 			success: true,
@@ -224,6 +374,85 @@ interface CurriculumData {
 	modules: CourseModule[]
 }
 
+export async function uploadCourseImageAction(formData: FormData) {
+	try {
+		const image = formData.get('image') as File
+		const courseId = formData.get('courseId') as string
+
+		if (!image || !courseId) {
+			return { success: false, error: 'Missing image or course ID' }
+		}
+
+		// Ensure user has permission to update this course
+		const userId = formData.get('userId') as string
+
+		// If userId is not provided in formData, we cannot verify permission
+		if (!userId) {
+			return { success: false, error: 'User authentication required' }
+		}
+
+		const instructorResult = await getInstructorByClerkId(userId)
+		if (!instructorResult?.data?._id) {
+			return { success: false, error: 'Instructor profile not found' }
+		}
+
+		const instructorId = instructorResult.data._id
+
+		// Verify course belongs to instructor
+		const courseExists = await client.fetch(
+			`*[_type == "course" && _id == $courseId && instructor._ref == $instructorId][0]._id`,
+			{ courseId, instructorId }
+		)
+
+		if (!courseExists) {
+			return {
+				success: false,
+				error: 'Course not found or you do not have permission to modify it',
+			}
+		}
+
+		// Convert the file to a buffer
+		const bytes = await image.arrayBuffer()
+		const buffer = Buffer.from(bytes)
+
+		// Upload the image to Sanity
+		const imageAsset = await client.assets.upload('image', buffer, {
+			filename: image.name,
+			contentType: image.type,
+		})
+
+		// Update the course with the new image
+		await client
+			.patch(courseId)
+			.set({
+				image: {
+					_type: 'image',
+					asset: {
+						_type: 'reference',
+						_ref: imageAsset._id,
+					},
+				},
+			})
+			.commit()
+
+		// Revalidate paths
+		revalidatePath(`/creator-dashboard/courses/${courseId}/edit`)
+		revalidatePath(`/creator-dashboard`)
+		revalidatePath(`/courses`)
+
+		return {
+			success: true,
+			imageUrl: imageAsset.url,
+			message: 'Image uploaded successfully',
+		}
+	} catch (error) {
+		console.error('Error uploading course image:', error)
+		return {
+			success: false,
+			error: error instanceof Error ? error.message : 'Failed to upload image',
+		}
+	}
+}
 export async function updateCourseCurriculumAction(data: CurriculumData) {
 	try {
 		const { courseId, modules } = data

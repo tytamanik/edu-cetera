@@ -1,3 +1,4 @@
+// File: components/dashboard/InstructorCourseCard.tsx
 'use client'
 
 import { Badge } from '@/components/ui/badge'
@@ -12,9 +13,11 @@ import {
 } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { urlFor } from '@/sanity/lib/image'
-import { CheckCircle2, Edit2, Eye, Lock } from 'lucide-react'
+import { CheckCircle2, Edit2, Lock } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useState } from 'react'
+import CoursePreviewButton from './CoursePreviewButton'
 
 interface Course {
 	_id: string
@@ -39,6 +42,8 @@ export default function InstructorCourseCard({
 }: InstructorCourseCardProps) {
 	const isPublished = !!course.published
 	const courseSlug = course.slug?.current || ''
+	const [imageError, setImageError] = useState(false)
+	const [isImageLoading, setIsImageLoading] = useState(true)
 
 	return (
 		<Card
@@ -49,20 +54,34 @@ export default function InstructorCourseCard({
 			)}
 		>
 			<div className='relative h-40 w-full bg-muted'>
-				{course.image ? (
-					<Image
-						src={urlFor(course.image).url() || ''}
-						alt={course.title || 'Course image'}
-						fill
-						className='object-cover'
-					/>
+				{course.image && !imageError ? (
+					<>
+						<Image
+							src={urlFor(course.image).url() || ''}
+							alt={course.title || 'Course image'}
+							fill
+							className={`object-cover transition-all ${isImageLoading ? 'opacity-0' : 'opacity-100'}`}
+							onLoad={() => setIsImageLoading(false)}
+							onError={() => {
+								setImageError(true)
+								setIsImageLoading(false)
+							}}
+						/>
+						{isImageLoading && (
+							<div className='flex h-full w-full items-center justify-center bg-muted'>
+								<div className='h-8 w-8 animate-spin rounded-full border-2 border-muted-foreground border-t-primary' />
+							</div>
+						)}
+					</>
 				) : (
 					<div className='flex h-full w-full items-center justify-center bg-muted'>
 						<div className='flex flex-col items-center'>
 							<div className='rounded-full bg-background p-2'>
 								<Edit2 className='h-6 w-6 text-muted-foreground' />
 							</div>
-							<p className='mt-2 text-sm text-muted-foreground'>No image yet</p>
+							<p className='mt-2 text-sm text-muted-foreground'>
+								{imageError ? 'Failed to load image' : 'No image yet'}
+							</p>
 						</div>
 					</div>
 				)}
@@ -108,18 +127,14 @@ export default function InstructorCourseCard({
 			</CardContent>
 
 			<CardFooter className='grid grid-cols-2 gap-2 pt-2 mt-auto'>
-				<Button asChild variant='outline' size='sm'>
-					<Link href={`/courses/${courseSlug}`} prefetch={false}>
-						<Eye className='mr-2 h-4 w-4' />
-						Preview
-					</Link>
-				</Button>
+				<CoursePreviewButton slug={courseSlug} variant='outline' size='sm' />
+
 				<Button asChild variant='default' size='sm'>
 					<Link
 						href={`/creator-dashboard/courses/${course._id}/edit`}
 						prefetch={false}
 					>
-						<Edit2 className='mr-2 h-4 w-4' />
+						<Edit2 className='h-4 w-4 mr-1' />
 						Edit
 					</Link>
 				</Button>

@@ -1,6 +1,8 @@
+// File: app/(creator)/creator-dashboard/page.tsx
 import { getInstructorProfileAction } from '@/app/actions/instructorActions'
 import CreateCourseButton from '@/components/dashboard/CreateCourseButton'
 import InstructorCourseCard from '@/components/dashboard/InstructorCourseCard'
+import { getCategories } from '@/sanity/lib/categories/getCategories'
 import { currentUser } from '@clerk/nextjs/server'
 import { BookOpen, GraduationCap, PlusCircle, Users } from 'lucide-react'
 import { redirect } from 'next/navigation'
@@ -21,15 +23,23 @@ export default async function CreatorDashboardPage() {
 		} | null
 	}
 
-	const { success, instructor } = (await getInstructorProfileAction(
-		user.id
-	)) as InstructorProfileResponse
+	const [{ success, instructor }, categoriesData] = await Promise.all([
+		getInstructorProfileAction(user.id) as Promise<InstructorProfileResponse>,
+		getCategories(),
+	])
 
 	if (!success || !instructor) {
 		return redirect('/become-instructor')
 	}
 
 	const { courses = [] } = instructor
+
+	const categories = categoriesData.map((category: any) => ({
+		_id: category._id,
+		name: category.name,
+		slug: category.slug,
+		color: category.color,
+	}))
 
 	interface Course {
 		_id: string
@@ -55,7 +65,7 @@ export default async function CreatorDashboardPage() {
 					</div>
 				</div>
 
-				{/* TODO: <CreateCourseButton /> */}
+				<CreateCourseButton categories={categories} />
 			</div>
 
 			<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8'>
@@ -99,7 +109,7 @@ export default async function CreatorDashboardPage() {
 			<div className='space-y-6'>
 				<div className='flex items-center justify-between'>
 					<h2 className='text-xl font-bold'>Your Courses</h2>
-					<CreateCourseButton variant='outline' size='sm' />
+					{/* Removed the duplicate Create Course button */}
 				</div>
 
 				{courses.length === 0 ? (
@@ -114,7 +124,7 @@ export default async function CreatorDashboardPage() {
 							Create your first course and start sharing your knowledge with the
 							world
 						</p>
-						<CreateCourseButton />
+						<CreateCourseButton categories={categories} />
 					</div>
 				) : (
 					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>

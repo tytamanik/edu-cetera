@@ -1,3 +1,4 @@
+// File: components/dashboard/CreateCourseButton.tsx
 'use client'
 
 import { createCourseAction } from '@/app/actions/courseActions'
@@ -13,18 +14,19 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useUser } from '@clerk/nextjs'
 import { Loader2, PlusCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
+import ClientCategories from './ClientCategories'
+
+interface Category {
+	_id: string
+	name: string
+	slug: string
+	color?: string
+}
 
 interface CreateCourseButtonProps {
 	variant?:
@@ -35,17 +37,28 @@ interface CreateCourseButtonProps {
 		| 'ghost'
 		| 'link'
 	size?: 'default' | 'sm' | 'lg' | 'icon'
+	categories?: Category[]
 }
 
 export default function CreateCourseButton({
 	variant = 'default',
 	size = 'default',
+	categories = [],
 }: CreateCourseButtonProps) {
 	const router = useRouter()
 	const { user } = useUser()
 	const [open, setOpen] = useState(false)
 	const [isPending, startTransition] = useTransition()
 	const [errors, setErrors] = useState<Record<string, string>>({})
+	const [selectedCategory, setSelectedCategory] = useState<string>(
+		categories[0]?.slug || ''
+	)
+
+	useEffect(() => {
+		if (categories.length > 0 && !selectedCategory) {
+			setSelectedCategory(categories[0].slug)
+		}
+	}, [categories, selectedCategory])
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
@@ -59,13 +72,15 @@ export default function CreateCourseButton({
 		const title = formData.get('title') as string
 		const slug = formData.get('slug') as string
 		const description = formData.get('description') as string
-		const category = formData.get('category') as string
 		const price = formData.get('price') as string
+
+		// Add the selected category to the form data
+		formData.set('category', selectedCategory)
 
 		if (!title) newErrors.title = 'Title is required'
 		if (!slug) newErrors.slug = 'Slug is required'
 		if (!description) newErrors.description = 'Description is required'
-		if (!category) newErrors.category = 'Category is required'
+		if (!selectedCategory) newErrors.category = 'Category is required'
 
 		if (price && isNaN(Number(price))) {
 			newErrors.price = 'Price must be a valid number'
@@ -183,21 +198,12 @@ export default function CreateCourseButton({
 					<div className='grid grid-cols-2 gap-4'>
 						<div className='space-y-2'>
 							<Label htmlFor='category'>Category</Label>
-							<Select name='category'>
-								<SelectTrigger
-									className={errors.category ? 'border-red-500' : ''}
-								>
-									<SelectValue placeholder='Select a category' />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value='technology'>Technology</SelectItem>
-									<SelectItem value='business'>Business</SelectItem>
-									<SelectItem value='design'>Design</SelectItem>
-									<SelectItem value='marketing'>Marketing</SelectItem>
-									<SelectItem value='photography'>Photography</SelectItem>
-									<SelectItem value='music'>Music</SelectItem>
-								</SelectContent>
-							</Select>
+							<ClientCategories
+								initialCategories={categories}
+								selectedCategory={selectedCategory}
+								onCategoryChange={setSelectedCategory}
+								className={errors.category ? 'border-red-500' : ''}
+							/>
 							{errors.category && (
 								<p className='text-red-500 text-sm mt-1'>{errors.category}</p>
 							)}

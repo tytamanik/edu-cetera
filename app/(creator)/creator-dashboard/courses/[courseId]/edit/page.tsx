@@ -1,6 +1,9 @@
-// Course Edit Page
+// File: app/(creator)/creator-dashboard/courses/[courseId]/edit/page.tsx
 import CourseForm from '@/components/dashboard/CourseForm'
+import CoursePreviewButton from '@/components/dashboard/CoursePreviewButton'
+import DeleteCourseButton from '@/components/dashboard/DeleteCourseButton'
 import { Button } from '@/components/ui/button'
+import { getCategories } from '@/sanity/lib/categories/getCategories'
 import { getCourseForEditing } from '@/sanity/lib/courses/getCourseForEditing'
 import { currentUser } from '@clerk/nextjs/server'
 import { ArrowLeft } from 'lucide-react'
@@ -23,7 +26,17 @@ export default async function CourseEditPage({ params }: CourseEditPageProps) {
 	const { courseId } = await params
 
 	try {
-		const course = await getCourseForEditing(courseId, user.id)
+		const [course, categoriesData] = await Promise.all([
+			getCourseForEditing(courseId, user.id),
+			getCategories(),
+		])
+
+		const categories = categoriesData.map((category: any) => ({
+			_id: category._id,
+			name: category.name,
+			slug: category.slug,
+			color: category.color,
+		}))
 
 		return (
 			<div className='container mx-auto px-4 py-8 mt-16'>
@@ -36,12 +49,27 @@ export default async function CourseEditPage({ params }: CourseEditPageProps) {
 							</Link>
 						</Button>
 					</div>
+
+					<div className='flex items-center gap-3'>
+						<CoursePreviewButton slug={course.slug?.current} />
+
+						<DeleteCourseButton
+							courseId={courseId}
+							courseName={course.title}
+							variant='destructive'
+							size='sm'
+						/>
+					</div>
 				</div>
 
 				<div className='max-w-3xl mx-auto'>
 					<h1 className='text-3xl font-bold mb-8'>Edit Course</h1>
 
-					<CourseForm courseId={courseId} initialData={course} />
+					<CourseForm
+						courseId={courseId}
+						initialData={course}
+						categories={categories}
+					/>
 				</div>
 			</div>
 		)
