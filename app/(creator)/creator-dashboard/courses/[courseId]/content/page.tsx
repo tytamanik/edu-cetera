@@ -7,15 +7,8 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
-interface CourseContentPageProps {
-	params: {
-		courseId: string
-	}
-}
-
-export default async function CourseContentPage({
-	params,
-}: CourseContentPageProps) {
+const CourseContentPage = async (props: any) => {
+	const { params } = props
 	const user = await currentUser()
 
 	if (!user?.id) {
@@ -58,3 +51,5 @@ export default async function CourseContentPage({
 		return redirect('/creator-dashboard')
 	}
 }
+
+export default CourseContentPage
