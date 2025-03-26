@@ -11,11 +11,9 @@ import { BookOpen, Clock, Filter, SortAsc, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 export const dynamic = 'force-dynamic'
 
-export default async function CoursesPage({
-	searchParams = {},
-}: {
-	searchParams?: { [key: string]: string | string[] | undefined }
-}) {
+export default async function CoursesPage(props: any) {
+	const { searchParams = {} } = props
+
 	const sort = (searchParams.sort as string) || 'popular'
 	const categoryParam = searchParams.category as string | string[]
 	const categories = Array.isArray(categoryParam)
