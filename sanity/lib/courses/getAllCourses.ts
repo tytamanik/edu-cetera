@@ -1,4 +1,4 @@
-// File: sanity/lib/courses/getAllCourses.ts
+// File: sanity/lib/courses/getAllCourses.ts - Replace the entire content of this file
 import { defineQuery } from 'groq'
 import { sanityFetch } from '../live'
 
@@ -21,7 +21,8 @@ export async function getAllCourses(filters?: CourseFilters, sort?: string) {
 
 		if (filters) {
 			if (filters.categories && filters.categories.length > 0) {
-				filterConditions.push(`category._ref in $categoryIds`)
+				// Get category IDs by slug and filter courses by them
+				filterConditions.push(`category->slug.current in $categorySlugs`)
 			}
 
 			if (filters.instructorId) {
@@ -101,7 +102,7 @@ export async function getAllCourses(filters?: CourseFilters, sort?: string) {
 		const params: Record<string, any> = {}
 
 		if (filters?.categories?.length) {
-			params.categoryIds = filters.categories
+			params.categorySlugs = filters.categories
 		}
 
 		if (filters?.instructorId) {

@@ -1,4 +1,4 @@
-// File: app/(user)/courses/page.tsx
+// File: app/(user)/courses/page.tsx - Replace the entire content of this file
 import { CourseCard } from '@/components/CourseCard'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -27,12 +27,24 @@ export default async function CoursesPage({
 			: []
 	const isFree = searchParams.free === 'true'
 	const isPaid = searchParams.paid === 'true'
+	const priceRange = searchParams.priceRange as string
+
+	// Parse price range if it exists
+	let priceRangeFilter = undefined
+	if (priceRange) {
+		const [min, max] = priceRange.split('-').map(Number)
+		priceRangeFilter = {
+			min: isNaN(min) ? undefined : min,
+			max: isNaN(max) ? undefined : max,
+		}
+	}
 
 	// Create filters object
 	const filters: CourseFilters = {
 		categories: categories,
 		isFree: isFree,
 		isPaid: isPaid,
+		priceRange: priceRangeFilter,
 	}
 
 	const [courses, categoriesData] = await Promise.all([
@@ -42,7 +54,10 @@ export default async function CoursesPage({
 
 	// Get active filter count for UI
 	const activeFilterCount =
-		(categories.length > 0 ? 1 : 0) + (isFree ? 1 : 0) + (isPaid ? 1 : 0)
+		(categories.length > 0 ? 1 : 0) +
+		(isFree ? 1 : 0) +
+		(isPaid ? 1 : 0) +
+		(priceRange ? 1 : 0)
 
 	// Helper function to generate filter URLs
 	const getFilterUrl = (
@@ -58,6 +73,20 @@ export default async function CoursesPage({
 		// Preserve current sort
 		if (sort) {
 			urlParams.set('sort', sort)
+		}
+
+		// Preserve current price range if not specifically changing it
+		if (priceRange && !params.hasOwnProperty('priceRange')) {
+			urlParams.set('priceRange', priceRange)
+		}
+
+		// Preserve free/paid filters if not specifically changing them
+		if (isFree && !params.hasOwnProperty('free')) {
+			urlParams.set('free', 'true')
+		}
+
+		if (isPaid && !params.hasOwnProperty('paid')) {
+			urlParams.set('paid', 'true')
 		}
 
 		// Add/replace parameters based on the argument
@@ -103,8 +132,17 @@ export default async function CoursesPage({
 			category: null,
 			free: null,
 			paid: null,
+			priceRange: null,
 		})
 	}
+
+	// Price range options
+	const priceRangeOptions = [
+		{ label: 'Under $20', value: '0-20' },
+		{ label: '$20 to $50', value: '20-50' },
+		{ label: '$50 to $100', value: '50-100' },
+		{ label: 'Over $100', value: '100-1000' },
+	]
 
 	return (
 		<div className='container mx-auto px-4 py-8 pt-16'>
@@ -147,13 +185,13 @@ export default async function CoursesPage({
 										<div key={category._id} className='flex items-center'>
 											<input
 												type='checkbox'
-												id={`category-${category.slug.current}`}
+												id={`category-${category.slug}`}
 												className='h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary'
-												checked={isCategoryActive(category.slug.current)}
+												checked={isCategoryActive(category.slug)}
 												readOnly
 											/>
 											<Link
-												href={toggleCategory(category.slug.current)}
+												href={toggleCategory(category.slug)}
 												className='ml-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary'
 											>
 												{category.name}
@@ -198,6 +236,33 @@ export default async function CoursesPage({
 									</div>
 								</div>
 							</div>
+
+							{/* Price Range Filter */}
+							<div>
+								<h4 className='text-sm font-medium mb-2'>Price Range</h4>
+								<div className='space-y-2'>
+									{priceRangeOptions.map(range => (
+										<div key={range.value} className='flex items-center'>
+											<input
+												type='checkbox'
+												id={`price-range-${range.value}`}
+												className='h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary'
+												checked={priceRange === range.value}
+												readOnly
+											/>
+											<Link
+												href={getFilterUrl({
+													priceRange:
+														priceRange === range.value ? null : range.value,
+												})}
+												className='ml-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary'
+											>
+												{range.label}
+											</Link>
+										</div>
+									))}
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -232,6 +297,15 @@ export default async function CoursesPage({
 									>
 										<SortAsc className='h-4 w-4 mr-2' />
 										Price: Low to High
+									</Link>
+								</TabsTrigger>
+								<TabsTrigger value='price-high' asChild>
+									<Link
+										href={getFilterUrl({ sort: 'price-high' })}
+										prefetch={false}
+									>
+										<SortAsc className='h-4 w-4 mr-2 rotate-180' />
+										Price: High to Low
 									</Link>
 								</TabsTrigger>
 							</TabsList>

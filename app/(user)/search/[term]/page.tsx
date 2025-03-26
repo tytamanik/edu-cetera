@@ -1,52 +1,358 @@
-// File: app/(user)/search/[term]/page.tsx
+// File: app/(user)/search/[term]/page.tsx - Replace the entire content of this file
 import { CourseCard } from '@/components/CourseCard'
-import { SearchQueryResult } from '@/sanity.types'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { getCategories } from '@/sanity/lib/categories/getCategories'
+import { CourseFilters } from '@/sanity/lib/courses/getAllCourses'
 import { searchCourses } from '@/sanity/lib/courses/searchCourses'
-import { Search } from 'lucide-react'
+import {
+	BookOpen,
+	Clock,
+	Filter,
+	Search,
+	SortAsc,
+	TrendingUp,
+} from 'lucide-react'
+import Link from 'next/link'
 
 interface SearchPageProps {
-	params: Promise<{
+	params: {
 		term: string
-	}>
+	}
+	searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export default async function SearchPage({ params }: SearchPageProps) {
-	const { term } = await params
-	const decodedTerm = decodeURIComponent(term)
-	const courses = await searchCourses(decodedTerm)
+export default async function SearchPage({
+	params,
+	searchParams,
+}: SearchPageProps) {
+	const decodedTerm = decodeURIComponent(params.term)
+
+	// Parse filter parameters - identical to courses page
+	const sort = (searchParams.sort as string) || 'popular'
+	const categoryParam = searchParams.category as string | string[]
+	const categories = Array.isArray(categoryParam)
+		? categoryParam
+		: categoryParam
+			? [categoryParam]
+			: []
+	const isFree = searchParams.free === 'true'
+	const isPaid = searchParams.paid === 'true'
+	const priceRange = searchParams.priceRange as string
+
+	// Parse price range if it exists
+	let priceRangeFilter = undefined
+	if (priceRange) {
+		const [min, max] = priceRange.split('-').map(Number)
+		priceRangeFilter = {
+			min: isNaN(min) ? undefined : min,
+			max: isNaN(max) ? undefined : max,
+		}
+	}
+
+	// Create filters object
+	const filters: CourseFilters = {
+		categories: categories,
+		isFree: isFree,
+		isPaid: isPaid,
+		priceRange: priceRangeFilter,
+	}
+
+	const [courses, categoriesData] = await Promise.all([
+		searchCourses(decodedTerm, filters, sort),
+		getCategories(),
+	])
+
+	// Get active filter count for UI
+	const activeFilterCount =
+		(categories.length > 0 ? 1 : 0) +
+		(isFree ? 1 : 0) +
+		(isPaid ? 1 : 0) +
+		(priceRange ? 1 : 0)
+
+	// Helper function to generate filter URLs
+	const getFilterUrl = (
+		params: Record<string, string | string[] | boolean | null>
+	) => {
+		// Start with current parameters
+		const urlParams = new URLSearchParams()
+
+		// Preserve current sort
+		if (sort && !params.hasOwnProperty('sort')) {
+			urlParams.set('sort', sort)
+		}
+
+		// Preserve current price range if not specifically changing it
+		if (priceRange && !params.hasOwnProperty('priceRange')) {
+			urlParams.set('priceRange', priceRange)
+		}
+
+		// Preserve free/paid filters if not specifically changing them
+		if (isFree && !params.hasOwnProperty('free')) {
+			urlParams.set('free', 'true')
+		}
+
+		if (isPaid && !params.hasOwnProperty('paid')) {
+			urlParams.set('paid', 'true')
+		}
+
+		// Preserve categories if not specifically changing them
+		if (categories.length > 0 && !params.hasOwnProperty('category')) {
+			categories.forEach(cat => urlParams.append('category', cat))
+		}
+
+		// Add/replace parameters based on the argument
+		Object.entries(params).forEach(([key, value]) => {
+			if (value === null) {
+				urlParams.delete(key)
+			} else if (Array.isArray(value)) {
+				urlParams.delete(key)
+				value.forEach(val => urlParams.append(key, val))
+			} else if (typeof value === 'boolean') {
+				urlParams.set(key, value.toString())
+			} else {
+				urlParams.set(key, value)
+			}
+		})
+
+		return `/search/${decodedTerm}?${urlParams.toString()}`
+	}
+
+	// Function to check if a category is active
+	const isCategoryActive = (categorySlug: string) => {
+		return categories.includes(categorySlug)
+	}
+
+	// Function to toggle a category in the active filter list
+	const toggleCategory = (categorySlug: string) => {
+		if (isCategoryActive(categorySlug)) {
+			// Remove category from filter
+			return getFilterUrl({
+				category: categories.filter(c => c !== categorySlug),
+			})
+		} else {
+			// Add category to filter
+			return getFilterUrl({
+				category: [...categories, categorySlug],
+			})
+		}
+	}
+
+	// Function to clear all filters
+	const clearAllFilters = () => {
+		return getFilterUrl({
+			category: null,
+			free: null,
+			paid: null,
+			priceRange: null,
+		})
+	}
+
+	// Price range options - identical to courses page
+	const priceRangeOptions = [
+		{ label: 'Under $20', value: '0-20' },
+		{ label: '$20 to $50', value: '20-50' },
+		{ label: '$50 to $100', value: '50-100' },
+		{ label: 'Over $100', value: '100-1000' },
+	]
 
 	return (
-		<div className='h-full pt-16'>
-			<div className='container mx-auto px-4 py-8'>
-				<div className='flex items-center gap-4 mb-8'>
-					<Search className='h-8 w-8 text-primary' />
-					<div>
-						<h1 className='text-3xl font-bold'>Search Results</h1>
-						<p className='text-muted-foreground'>
-							Found {courses.length} result{courses.length === 1 ? '' : 's'} for
-							&quot;{decodedTerm}&quot;
-						</p>
+		<div className='container mx-auto px-4 py-8 pt-16'>
+			<div className='flex items-center gap-4 mb-8'>
+				<Search className='h-8 w-8 text-primary' />
+				<div>
+					<h1 className='text-3xl font-bold'>Search Results</h1>
+					<p className='text-muted-foreground'>
+						Found {courses.length} result{courses.length === 1 ? '' : 's'} for
+						&quot;{decodedTerm}&quot;
+					</p>
+				</div>
+			</div>
+
+			<div className='flex flex-col md:flex-row gap-6'>
+				{/* Filter sidebar - identical to courses page */}
+				<div className='md:w-64 space-y-6'>
+					<div className='bg-card rounded-lg border p-4'>
+						<div className='flex items-center justify-between mb-4'>
+							<h3 className='font-medium flex items-center gap-2'>
+								<Filter className='h-4 w-4' />
+								Filters
+								{activeFilterCount > 0 && (
+									<span className='ml-1 inline-flex items-center justify-center w-5 h-5 text-xs font-medium rounded-full bg-primary text-white'>
+										{activeFilterCount}
+									</span>
+								)}
+							</h3>
+							<Link href={clearAllFilters()}>
+								<Button variant='ghost' size='sm' className='h-8 text-xs'>
+									Clear All
+								</Button>
+							</Link>
+						</div>
+
+						<div className='space-y-4'>
+							<div>
+								<h4 className='text-sm font-medium mb-2'>Categories</h4>
+								<div className='space-y-2'>
+									{categoriesData.map(category => (
+										<div key={category._id} className='flex items-center'>
+											<input
+												type='checkbox'
+												id={`category-${category.slug}`}
+												className='h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary'
+												checked={isCategoryActive(category.slug)}
+												readOnly
+											/>
+											<Link
+												href={toggleCategory(category.slug)}
+												className='ml-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary'
+											>
+												{category.name}
+											</Link>
+										</div>
+									))}
+								</div>
+							</div>
+
+							<div>
+								<h4 className='text-sm font-medium mb-2'>Price</h4>
+								<div className='space-y-2'>
+									<div className='flex items-center'>
+										<input
+											type='checkbox'
+											id='price-free'
+											className='h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary'
+											checked={isFree}
+											readOnly
+										/>
+										<Link
+											href={getFilterUrl({ free: !isFree })}
+											className='ml-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary'
+										>
+											Free
+										</Link>
+									</div>
+									<div className='flex items-center'>
+										<input
+											type='checkbox'
+											id='price-paid'
+											className='h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary'
+											checked={isPaid}
+											readOnly
+										/>
+										<Link
+											href={getFilterUrl({ paid: !isPaid })}
+											className='ml-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary'
+										>
+											Paid
+										</Link>
+									</div>
+								</div>
+							</div>
+
+							{/* Price Range Filter */}
+							<div>
+								<h4 className='text-sm font-medium mb-2'>Price Range</h4>
+								<div className='space-y-2'>
+									{priceRangeOptions.map(range => (
+										<div key={range.value} className='flex items-center'>
+											<input
+												type='checkbox'
+												id={`price-range-${range.value}`}
+												className='h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary'
+												checked={priceRange === range.value}
+												readOnly
+											/>
+											<Link
+												href={getFilterUrl({
+													priceRange:
+														priceRange === range.value ? null : range.value,
+												})}
+												className='ml-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary'
+											>
+												{range.label}
+											</Link>
+										</div>
+									))}
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 
-				{courses.length === 0 ? (
-					<div className='text-center py-12'>
-						<h2 className='text-2xl font-semibold mb-4'>No courses found</h2>
-						<p className='text-muted-foreground mb-8'>
-							Try searching with different keywords
+				{/* Main content */}
+				<div className='flex-1'>
+					<div className='mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
+						<Tabs defaultValue={sort} className='w-full sm:w-auto'>
+							<TabsList>
+								<TabsTrigger value='popular' asChild>
+									<Link
+										href={getFilterUrl({ sort: 'popular' })}
+										prefetch={false}
+									>
+										<TrendingUp className='h-4 w-4 mr-2' />
+										Popular
+									</Link>
+								</TabsTrigger>
+								<TabsTrigger value='newest' asChild>
+									<Link
+										href={getFilterUrl({ sort: 'newest' })}
+										prefetch={false}
+									>
+										<Clock className='h-4 w-4 mr-2' />
+										Newest
+									</Link>
+								</TabsTrigger>
+								<TabsTrigger value='price-low' asChild>
+									<Link
+										href={getFilterUrl({ sort: 'price-low' })}
+										prefetch={false}
+									>
+										<SortAsc className='h-4 w-4 mr-2' />
+										Price: Low to High
+									</Link>
+								</TabsTrigger>
+								<TabsTrigger value='price-high' asChild>
+									<Link
+										href={getFilterUrl({ sort: 'price-high' })}
+										prefetch={false}
+									>
+										<SortAsc className='h-4 w-4 mr-2 rotate-180' />
+										Price: High to Low
+									</Link>
+								</TabsTrigger>
+							</TabsList>
+						</Tabs>
+
+						<p className='text-sm text-muted-foreground'>
+							Showing {courses.length} results
 						</p>
 					</div>
-				) : (
-					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-						{courses.map((course: SearchQueryResult[number]) => (
-							<CourseCard
-								key={course._id}
-								course={course}
-								href={`/courses/${course.slug}`}
-							/>
-						))}
-					</div>
-				)}
+
+					{courses.length === 0 ? (
+						<div className='text-center py-12 bg-muted/20 rounded-lg border border-dashed'>
+							<BookOpen className='mx-auto h-12 w-12 text-muted-foreground mb-3' />
+							<h3 className='text-lg font-medium mb-2'>No courses found</h3>
+							<p className='text-muted-foreground mb-6 max-w-md mx-auto'>
+								We couldn&apos;t find any courses that match your search for
+								&quot;{decodedTerm}&quot; with the selected filters.
+							</p>
+							<Link href='/courses'>
+								<Button>Browse All Courses</Button>
+							</Link>
+						</div>
+					) : (
+						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+							{courses.map(course => (
+								<CourseCard
+									key={course._id}
+									course={course}
+									href={`/courses/${course.slug}`}
+								/>
+							))}
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	)

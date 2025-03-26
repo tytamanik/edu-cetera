@@ -5,9 +5,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import {
 	Bookmark,
-	BookMarked,
 	Compass,
-	Flame,
 	History,
 	Home,
 	Library,
@@ -138,29 +136,6 @@ export function SidebarNav() {
 		},
 	]
 
-	const topicNavItems = [
-		{
-			href: '/category/technology',
-			icon: <Flame className='h-5 w-5 text-red-500' />,
-			label: 'Technology',
-		},
-		{
-			href: '/category/business',
-			icon: <BookMarked className='h-5 w-5 text-blue-500' />,
-			label: 'Business',
-		},
-		{
-			href: '/category/design',
-			icon: <Compass className='h-5 w-5 text-purple-500' />,
-			label: 'Design',
-		},
-		{
-			href: '/category/marketing',
-			icon: <Play className='h-5 w-5 text-green-500' />,
-			label: 'Marketing',
-		},
-	]
-
 	if (typeof window !== 'undefined' && window.innerWidth < 640) {
 		return (
 			<nav className='fixed bottom-0 left-0 right-0 z-50 bg-background border-t flex justify-around items-center p-2'>
@@ -238,45 +213,6 @@ export function SidebarNav() {
 							/>
 						))}
 					</div>
-
-					{/* Topics section */}
-					{!isCollapsed && (
-						<div className='border-t pt-4 px-3'>
-							<h3 className='text-sm font-medium px-3 mb-2'>Popular Topics</h3>
-							<div className='space-y-1'>
-								{topicNavItems.map(item => (
-									<NavItem
-										key={item.href}
-										href={item.href}
-										icon={item.icon}
-										label={item.label}
-										isActive={pathname === item.href}
-										collapsed={false}
-									/>
-								))}
-							</div>
-						</div>
-					)}
-
-					{isCollapsed && (
-						<div className='border-t pt-4 px-1'>
-							<div className='flex justify-center mb-2'>
-								<div className='h-0.5 w-8 bg-muted-foreground/30 rounded-full' />
-							</div>
-							<div className='grid grid-cols-1 gap-1'>
-								{topicNavItems.map(item => (
-									<NavItem
-										key={item.href}
-										href={item.href}
-										icon={item.icon}
-										label={item.label}
-										isActive={pathname === item.href}
-										collapsed={true}
-									/>
-								))}
-							</div>
-						</div>
-					)}
 				</div>
 			</aside>
 		</>
