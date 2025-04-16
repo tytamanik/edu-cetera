@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   try {
     const instructors = await getSubscribedInstructors(userId);
     return NextResponse.json({ instructors });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch notifications' }, { status: 500 });
   }
 }

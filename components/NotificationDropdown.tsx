@@ -13,7 +13,6 @@ import {
 } from "./ui/dropdown-menu";
 import Link from "next/link";
 import Image from "next/image";
-import { getSubscribedInstructors } from "@/sanity/lib/instructor/getSubscribedInstructors";
 
 export default function NotificationDropdown() {
   const { user, isLoaded } = useUser();

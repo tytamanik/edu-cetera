@@ -8,8 +8,6 @@ import {
 	getPopularCategories,
 } from '@/sanity/lib/courses/getFeaturedCourses'
 import React from 'react';
-import * as LucideIcons from 'lucide-react';
-
 
 // Removed categoryIconMap. Using LucideDynamicIcon everywhere for categories.
 import { BookOpen, Compass, GraduationCap, Star } from 'lucide-react';

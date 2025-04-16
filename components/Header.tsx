@@ -1,7 +1,7 @@
 'use client'
 
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
-import { Bell, BookOpen, Menu } from 'lucide-react'
+import { BookOpen, Menu } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import DarkModeToggle from './DarkModeToggle'

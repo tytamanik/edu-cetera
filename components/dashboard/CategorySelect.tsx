@@ -8,10 +8,10 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import React from 'react';
-import * as LucideIcons from 'lucide-react';
+
 import LucideDynamicIcon from '@/components/LucideDynamicIcon';
 import { Loader2 } from 'lucide-react';
-import { BookOpen } from 'lucide-react';
+
 
 interface Category {
 	_id: string
