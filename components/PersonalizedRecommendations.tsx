@@ -4,7 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import { CourseCard } from "@/components/CourseCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GetCoursesQueryResult } from "@/sanity.types";
-import { BookOpen, Brain, Sparkles } from "lucide-react";
+import { Brain, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 

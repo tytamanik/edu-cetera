@@ -92,10 +92,10 @@ export async function POST(req: NextRequest) {
     if (!recommendedCourses || recommendedCourses.length === 0) {
       // Fallback: recommend courses from the same category (excluding already enrolled/completed)
       let fallbackCourses: any[] = [];
-      let allUserCoursesDebug: any[] = userCourses.map((c: any) => ({ slug: c.slug, title: c.title, category: c.category?.slug }));
-      let userCourseSlugs = userCourses.map((c: any) => c.slug);
+      const allUserCoursesDebug: any[] = userCourses.map((c: any) => ({ slug: c.slug, title: c.title, category: c.category?.slug }));
+      const userCourseSlugs = userCourses.map((c: any) => c.slug);
       // Fix: always extract category slug as string
-      let userCategorySlugs = Array.from(
+      const userCategorySlugs = Array.from(
         new Set(
           userCourses
             .map((c: any) =>

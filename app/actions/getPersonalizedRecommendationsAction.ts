@@ -73,7 +73,7 @@ export async function getPersonalizedRecommendationsAction(userId: string) {
     }
 
     // Get courses based on AI recommendations
-    let recommendedCourses = [];
+    const recommendedCourses = [];
     for (const topic of recommendedTopics) {
       const topicCourses = await searchCourses(topic);
       recommendedCourses.push(...topicCourses);

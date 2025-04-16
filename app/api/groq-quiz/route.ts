@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ quiz: [], error: `Groq API JSON parse error: ${String(err)}` }, { status: 500 });
     }
     let quiz = [];
-    let rawText = groqData.choices?.[0]?.message?.content || "";
+    const rawText = groqData.choices?.[0]?.message?.content || "";
     try {
       quiz = JSON.parse(rawText);
       if (!Array.isArray(quiz)) throw new Error();
