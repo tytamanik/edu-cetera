@@ -2,16 +2,7 @@ import { CourseCard } from '@/components/CourseCard'
 import { GetCoursesQueryResult } from '@/sanity.types'
 import { getCategories } from '@/sanity/lib/categories/getCategories'
 import { searchCourses } from '@/sanity/lib/courses/searchCourses'
-import {
-	BookOpen,
-	Briefcase,
-	Camera,
-	Code,
-	Compass,
-	Globe,
-	LucideProps,
-	PenTool,
-} from 'lucide-react'
+import { Compass } from 'lucide-react'
 import Link from 'next/link'
 import LucideDynamicIcon from '@/components/LucideDynamicIcon';
 // Removed categoryIcons mapping. Using LucideDynamicIcon instead.

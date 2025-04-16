@@ -5,7 +5,7 @@ import { GetCoursesQueryResult } from '@/sanity.types'
 import { getCategoryBySlug } from '@/sanity/lib/categories/getCategoryBySlug'
 import { getCoursesByCategory } from '@/sanity/lib/courses/getCoursesByCategory'
 import React from 'react';
-import * as LucideIcons from 'lucide-react';
+
 import LucideDynamicIcon from '@/components/LucideDynamicIcon';
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
