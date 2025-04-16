@@ -1,5 +1,7 @@
 import { CourseCard } from '@/components/CourseCard'
 import Hero from '@/components/Hero'
+import { PersonalizedQuiz } from '@/components/PersonalizedQuiz'
+import { PersonalizedRecommendations } from '@/components/PersonalizedRecommendations'
 import { Button } from '@/components/ui/button'
 import { GetCoursesQueryResult } from '@/sanity.types'
 import {
@@ -31,6 +33,12 @@ export default async function Home() {
 	return (
 		<div className='pb-20 sm:pb-6'>
 			<Hero />
+
+			{/* Personalized Quiz Section */}
+			<PersonalizedQuiz />
+
+			{/* Personalized Recommendations Section */}
+			<PersonalizedRecommendations />
 
 			<section className='container mx-auto px-4 py-12'>
 				<div className='flex flex-col md:flex-row md:items-center md:justify-between mb-8'>
