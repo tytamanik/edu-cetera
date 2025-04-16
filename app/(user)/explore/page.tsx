@@ -5,7 +5,7 @@ import { searchCourses } from '@/sanity/lib/courses/searchCourses'
 import { Compass } from 'lucide-react'
 import Link from 'next/link'
 import LucideDynamicIcon from '@/components/LucideDynamicIcon';
-// Removed categoryIcons mapping. Using LucideDynamicIcon instead.
+
 
 export default async function ExplorePage() {
 	const categories = await getCategories()

@@ -4,16 +4,16 @@ import { getLessonCompletionHistory } from "@/sanity/lib/lessons/getLessonComple
 import { getEnrolledCourses } from "@/sanity/lib/student/getEnrolledCourses";
 import { searchCourses } from "@/sanity/lib/courses/searchCourses";
 
-// This action fetches personalized course recommendations based on user history
+
 export async function getPersonalizedRecommendationsAction(userId: string) {
   try {
-    // Get user's completed lessons and enrolled courses
+
     const [completions, enrolledCourses] = await Promise.all([
       getLessonCompletionHistory(userId),
       getEnrolledCourses(userId)
     ]);
 
-    // If user has no history, return empty recommendations
+ 
     if (completions.length === 0 && enrolledCourses.length === 0) {
       return {
         success: true,
@@ -22,7 +22,7 @@ export async function getPersonalizedRecommendationsAction(userId: string) {
       };
     }
 
-    // Extract course titles, categories and topics for recommendation input
+
     const completedCourseTitles = completions.map((completion: { course: { title: string } }) => completion.course.title);
     const completedCourseCategories = completions
       .filter((completion: { course: { category: { name: string } } }) => completion.course.category?.name)
@@ -36,11 +36,11 @@ export async function getPersonalizedRecommendationsAction(userId: string) {
       .filter((enrollment: any) => enrollment.course && enrollment.course.category && enrollment.course.category.name)
       .map((enrollment: any) => enrollment.course.category.name);
 
-    // Combine all course data for analysis
+ 
     const allCourseTitles = [...new Set([...completedCourseTitles, ...enrolledCourseTitles])];
     const allCategories = [...new Set([...completedCourseCategories, ...enrolledCourseCategories])];
     
-    // If we don't have any data to work with, return empty recommendations
+    
     if (allCourseTitles.length === 0 && allCategories.length === 0) {
       return {
         success: true,
@@ -49,19 +49,19 @@ export async function getPersonalizedRecommendationsAction(userId: string) {
       };
     }
 
-    // Get enrolled course IDs to exclude them from recommendations
+    
     const enrolledCourseIds = enrolledCourses
       .filter(enrollment => enrollment.course?._id)
       .map(enrollment => enrollment.course?._id);
 
-    // Prepare prompt for GROQ API based on user's history
+ 
     const prompt = buildRecommendationPrompt(allCourseTitles, allCategories);
     
-    // Call GROQ API to get recommended topics/categories
+  
     const recommendedTopics = await getAIRecommendations(prompt);
     
     if (!recommendedTopics || recommendedTopics.length === 0) {
-      // Fallback: use existing categories if AI fails
+  
       const allCourses = await searchCourses("");
       return {
         success: true,
@@ -72,20 +72,20 @@ export async function getPersonalizedRecommendationsAction(userId: string) {
       };
     }
 
-    // Get courses based on AI recommendations
+
     const recommendedCourses = [];
     for (const topic of recommendedTopics as string[]) {
       const topicCourses = await searchCourses(topic);
       recommendedCourses.push(...topicCourses);
     }
 
-    // Filter out enrolled courses and remove duplicates
+    
     const uniqueRecommendations = recommendedCourses
       .filter((course: any) => !enrolledCourseIds.includes(course._id))
       .filter((course, index, self) => 
         index === self.findIndex((c: any) => c._id === course._id)
       )
-      .slice(0, 6); // Limit to 6 recommendations
+      .slice(0, 6); 
 
     return {
       success: true,
@@ -102,7 +102,7 @@ export async function getPersonalizedRecommendationsAction(userId: string) {
   }
 }
 
-// Helper function to build the prompt for GROQ
+
 function buildRecommendationPrompt(courseTitles: (string | undefined)[], categories: (string | undefined)[]) {
   const filteredTitles = courseTitles.filter(Boolean).join(", ");
   const filteredCategories = categories.filter(Boolean).join(", ");
@@ -118,7 +118,7 @@ function buildRecommendationPrompt(courseTitles: (string | undefined)[], categor
   `;
 }
 
-// Function to call GROQ API
+
 async function getAIRecommendations(prompt: string): Promise<string[]> {
   try {
     if (!process.env.GROQ_API_KEY) {
@@ -157,7 +157,7 @@ async function getAIRecommendations(prompt: string): Promise<string[]> {
     const data = await response.json();
     const recommendationsText = data.choices[0]?.message?.content || "";
     
-    // Parse the comma-separated list of topics
+  
     return recommendationsText
       .split(',')
       .map((topic: string) => topic.trim())

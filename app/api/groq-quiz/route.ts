@@ -9,16 +9,16 @@ export async function POST(req: NextRequest) {
     if (!userId) return NextResponse.json({ quiz: [], error: "Missing userId" }, { status: 400 });
     if (!GROQ_API_KEY) return NextResponse.json({ quiz: [], error: "Missing GROQ_API_KEY env variable" }, { status: 500 });
 
-    // Get user's enrolled courses
+
     let enrolled;
     try {
       enrolled = await getEnrolledCourses(userId);
     } catch (err) {
       return NextResponse.json({ quiz: [], error: `Failed to fetch enrolled courses: ${String(err)}` }, { status: 500 });
     }
-    // Log raw enrolled data for debugging
+
     const enrolledRaw = Array.isArray(enrolled) ? enrolled : [];
-    // Map to course objects if enrollment has .course
+    
     const enrolledCourses = enrolledRaw
       .map((enrollment: any) => enrollment && enrollment.course ? enrollment.course : enrollment)
       .filter((course: any) => course && course.title && course.slug);
@@ -33,11 +33,11 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Build prompt for Groq
+ 
     const courseList = enrolledCourses.map((c: any) => `- ${c.title} (slug: ${c.slug})`).join("\n");
     const prompt = `Given the following user-enrolled course${enrolledCourses.length > 1 ? 's' : ''}, generate a 5-question quiz.\n- Mix questions by topic if there are multiple courses.\n- Each question must be either multiple-choice or single-choice (provide 3-5 choices per question, only one correct answer).\n- Attach a 'topic' field to each question indicating the relevant course title.\n- Format as a JSON array of objects: [{\"question\": string, \"choices\": string[], \"answer\": string, \"topic\": string}].\n- Do NOT include any text outside the JSON array.\nCourses:\n${courseList}`;
 
-    // Query Groq Cloud API
+
     let groqRes;
     try {
       groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {

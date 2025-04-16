@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ courses: [], error: "Missing GROQ_API_KEY env variable" }, { status: 500 });
     }
 
-    // Fetch user's course history and enrolled courses
+    
     let history, enrolled;
     try {
       [history, enrolled] = await Promise.all([
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ courses: [], error: `Failed to fetch user data: ${String(err)}` }, { status: 500 });
     }
 
-    // Collect unique course IDs from both sources
+  
     const courseMap = new Map();
     [...(history || []), ...(enrolled || [])].forEach((item: any) => {
       const course = item.course || item;
@@ -33,10 +33,10 @@ export async function POST(req: NextRequest) {
     const userCourses = Array.from(courseMap.values());
     if (!userCourses.length) return NextResponse.json({ courses: [], error: "No user courses found" });
 
-    // Prepare improved prompt for Groq AI
+   
     const prompt = `Given the following user course history and enrollments, recommend 3 additional relevant courses from our catalog.\nUser courses (with slugs):\n${userCourses.map((c: any) => `- ${c.title} (slug: ${c.slug})`).join("\n")}.\nRespond ONLY with a JSON array of up to 3 course slugs (not titles) that exist in our catalog and are not already in the user's list. Example: [\"slug-1\", \"slug-2\", \"slug-3\"]`;
 
-    // Query Groq Cloud API
+    
     let groqRes;
     try {
       groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -69,18 +69,18 @@ export async function POST(req: NextRequest) {
     } catch (err) {
       return NextResponse.json({ courses: [], error: `Groq API JSON parse error: ${String(err)}` }, { status: 500 });
     }
-    // Parse the Groq response to extract course slugs/IDs
+   
     let recommendedSlugs: string[] = [];
     try {
       const text = groqData.choices?.[0]?.message?.content || "";
-      // Try to parse as JSON array, fallback to regex
+    
       recommendedSlugs = JSON.parse(text);
       if (!Array.isArray(recommendedSlugs)) throw new Error();
     } catch {
       const text = groqData.choices?.[0]?.message?.content || "";
       recommendedSlugs = Array.from(text.matchAll(/([\w-]{6,})/g)).map((m) => (m as RegExpMatchArray)[1]);
     }
-    // Fetch course details from Sanity
+    
     let recommendedCourses;
     try {
       const { getCoursesBySlugs } = await import("@/sanity/lib/courses/getCoursesBySlugs");
@@ -90,11 +90,11 @@ export async function POST(req: NextRequest) {
     }
 
     if (!recommendedCourses || recommendedCourses.length === 0) {
-      // Fallback: recommend courses from the same category (excluding already enrolled/completed)
+      
       let fallbackCourses: any[] = [];
       const allUserCoursesDebug: any[] = userCourses.map((c: any) => ({ slug: c.slug, title: c.title, category: c.category?.slug }));
       const userCourseSlugs = userCourses.map((c: any) => c.slug);
-      // Fix: always extract category slug as string
+      
       const userCategorySlugs = Array.from(
         new Set(
           userCourses
@@ -108,15 +108,15 @@ export async function POST(req: NextRequest) {
       );
       try {
         if (userCategorySlugs.length > 0) {
-          // Import getCoursesByCategory
+        
           const { getCoursesByCategory } = await import("@/sanity/lib/courses/getCoursesByCategory");
-          // Get all courses from these categories
+         
           const allCategoryCourses = (await Promise.all(userCategorySlugs.map((catSlug) => getCoursesByCategory(catSlug)))).flat();
-          // Filter out courses the user already has (but allow showing if user has < all in category)
+         
           fallbackCourses = allCategoryCourses.filter((course: any) => !userCourseSlugs.includes(course.slug));
         }
       } catch (err) {
-        // If fallback fails, just return debug info
+       
         return NextResponse.json({
           courses: [],
           debug: {
@@ -128,8 +128,7 @@ export async function POST(req: NextRequest) {
           }
         });
       }
-      // If user already has all courses in the category, fallbackCourses will be empty
-      // Limit fallback to 6 courses
+      
       return NextResponse.json({
         courses: fallbackCourses.slice(0, 6),
         debug: {

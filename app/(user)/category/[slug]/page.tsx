@@ -1,4 +1,4 @@
-// Insert this file at app/(user)/category/[slug]/page.tsx
+
 
 import { CourseCard } from '@/components/CourseCard'
 import { GetCoursesQueryResult } from '@/sanity.types'

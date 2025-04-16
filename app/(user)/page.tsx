@@ -11,7 +11,7 @@ import {
 } from '@/sanity/lib/courses/getFeaturedCourses'
 import React from 'react';
 
-// Removed categoryIconMap. Using LucideDynamicIcon everywhere for categories.
+
 import { BookOpen, Compass, GraduationCap, Star } from 'lucide-react';
 import LucideDynamicIcon from '@/components/LucideDynamicIcon';
 import Link from 'next/link'
@@ -34,10 +34,10 @@ export default async function Home() {
 		<div className='pb-20 sm:pb-6'>
 			<Hero />
 
-			{/* Personalized Quiz Section */}
+		
 			<PersonalizedQuiz />
 
-			{/* Personalized Recommendations Section */}
+			
 			<PersonalizedRecommendations />
 
 			<section className='container mx-auto px-4 py-12'>
