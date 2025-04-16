@@ -4,6 +4,7 @@ import { SidebarProvider } from '@/components/providers/sidebar-provider'
 import { ThemeProvider } from '@/components/theme-provider'
 import { SanityLive } from '@/sanity/lib/live'
 import { ClerkProvider } from '@clerk/nextjs'
+import Footer from '@/components/Footer'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -33,6 +34,7 @@ export default function UserLayout({
 								{children}
 							</main>
 						</div>
+						<Footer />
 					</div>
 				</SidebarProvider>
 			</ThemeProvider>

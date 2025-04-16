@@ -4,7 +4,8 @@ import { CourseCard } from '@/components/CourseCard'
 import { GetCoursesQueryResult } from '@/sanity.types'
 import { getCategoryBySlug } from '@/sanity/lib/categories/getCategoryBySlug'
 import { getCoursesByCategory } from '@/sanity/lib/courses/getCoursesByCategory'
-import { Folder } from 'lucide-react'
+import React from 'react';
+import * as LucideIcons from 'lucide-react';
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -38,11 +39,11 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 							color: category.color || 'currentColor',
 						}}
 					>
-						{category.icon ? (
-							<span className='text-2xl'>{category.icon}</span>
-						) : (
-							<Folder className='h-6 w-6' />
-						)}
+						{category.icon && LucideIcons[category.icon.replace(/-([a-z])/g, (g: any) => g[1].toUpperCase()).replace(/^(.)/, (g: any) => g[0].toUpperCase())] ? (
+  React.createElement(LucideIcons[category.icon.replace(/-([a-z])/g, (g: any) => g[1].toUpperCase()).replace(/^(.)/, (g: any) => g[0].toUpperCase())], { className: 'h-6 w-6' })
+) : (
+  <LucideIcons.Folder className='h-6 w-6' />
+)}
 					</div>
 					<div>
 						<h1 className='text-3xl font-bold'>{category.name}</h1>

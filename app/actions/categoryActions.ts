@@ -7,6 +7,7 @@ type CategoryResponse = {
 	name: string
 	slug: string
 	color?: string
+	icon?: string
 }
 
 export async function getCategoriesAction() {
@@ -19,6 +20,7 @@ export async function getCategoriesAction() {
 				name: category.name,
 				slug: category.slug,
 				color: category.color,
+				icon: category.icon,
 			})) as CategoryResponse[],
 		}
 	} catch (error) {

@@ -9,6 +9,10 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 export default async function SubscriptionsPage() {
+ 
+  if (typeof window !== 'undefined') {
+    fetch('/api/notifications/mark-read', { method: 'POST' });
+  }
 	const user = await currentUser()
 
 	if (!user?.id) {

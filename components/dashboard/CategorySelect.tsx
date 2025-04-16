@@ -7,13 +7,17 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select'
-import { Loader2 } from 'lucide-react'
+import React from 'react';
+import * as LucideIcons from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 
 interface Category {
 	_id: string
 	name: string
 	slug: string
 	color?: string
+	icon?: string
 }
 
 interface CategorySelectProps {
@@ -62,6 +66,11 @@ export default function CategorySelect({
 								style={{ backgroundColor: category.color }}
 							/>
 						) : null}
+						{category.icon && LucideIcons[category.icon.replace(/-([a-z])/g, (g: any) => g[1].toUpperCase()).replace(/^(.)/, (g: any) => g[0].toUpperCase())] ? (
+							React.createElement(LucideIcons[category.icon.replace(/-([a-z])/g, (g: any) => g[1].toUpperCase()).replace(/^(.)/, (g: any) => g[0].toUpperCase())], { className: 'inline-block w-4 h-4 mr-2 align-text-bottom' })
+						) : (
+							<LucideIcons.BookOpen className='inline-block w-4 h-4 mr-2 align-text-bottom' />
+						)}
 						{category.name}
 					</SelectItem>
 				))}

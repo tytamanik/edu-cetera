@@ -9,6 +9,7 @@ import HeaderAction from './HeaderAction'
 import { useSidebar } from './providers/sidebar-provider'
 import { SearchInput } from './SearchInput'
 import { Button } from './ui/button'
+import NotificationDropdown from './NotificationDropdown'
 
 export default function Header() {
 	const [sidebarVisible, setSidebarVisible] = useState(false)
@@ -53,9 +54,9 @@ export default function Header() {
 				<div className='flex items-center space-x-2 md:space-x-4'>
 					<SignedIn>
 						<HeaderAction />
-						<Button variant='ghost' size='icon' className='hidden md:flex'>
-							<Bell className='h-5 w-5' />
-						</Button>
+						<div className='hidden md:flex'>
+							<NotificationDropdown />
+						</div>
 						<UserButton afterSignOutUrl='/' />
 					</SignedIn>
 

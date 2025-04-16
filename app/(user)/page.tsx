@@ -7,7 +7,17 @@ import {
 	getNewestCourses,
 	getPopularCategories,
 } from '@/sanity/lib/courses/getFeaturedCourses'
-import { BookOpen, Compass, GraduationCap, Star } from 'lucide-react'
+import React from 'react';
+import * as LucideIcons from 'lucide-react';
+
+
+const categoryIconMap: Record<string, React.FC<LucideIcons.LucideProps>> = {
+  BookOpen: LucideIcons.BookOpen,
+  Compass: LucideIcons.Compass,
+  GraduationCap: LucideIcons.GraduationCap,
+  Star: LucideIcons.Star,
+};
+import { BookOpen, Compass, GraduationCap, Star } from 'lucide-react';
 import Link from 'next/link'
 export const revalidate = 3600
 
@@ -16,14 +26,14 @@ export default async function Home() {
 		[getFeaturedCourses(6), getNewestCourses(3), getPopularCategories(5)]
 	)
 	type CategoryWithCount = {
-		_id: string
-		name: string
-		slug: string
-		description?: string
-		color?: string
-		icon?: string
-		courseCount: number
-	}
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  color?: string;
+  icon?: string;
+  courseCount: number;
+};
 	return (
 		<div className='pb-20 sm:pb-6'>
 			<Hero />
@@ -88,11 +98,14 @@ export default async function Home() {
 									className='flex flex-col items-center justify-center p-6 rounded-lg bg-background border hover:shadow-md transition-all hover:border-primary'
 								>
 									<div className='p-4 bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mb-4'>
-										{category.icon ? (
-											<span className='text-2xl'>{category.icon}</span>
-										) : (
-											<BookOpen className='h-8 w-8' />
-										)}
+										{(() => {
+  const iconKey = category.icon && category.icon.replace(/-([a-z])/g, (g: any) => g[1].toUpperCase()).replace(/^(.)/, (g: any) => g[0].toUpperCase());
+  const Icon = iconKey && categoryIconMap[iconKey];
+  if (Icon) {
+    return <Icon className='h-8 w-8' />;
+  }
+  return <LucideIcons.BookOpen className='h-8 w-8' />;
+})()}
 									</div>
 									<span className='font-medium text-center'>
 										{category.name}
@@ -202,21 +215,20 @@ export default async function Home() {
 				</div>
 			</section>
 
-			<section className='bg-gradient-to-r from-primary/90 to-primary text-white py-16'>
-				<div className='container mx-auto px-4 text-center'>
-					<h2 className='text-3xl font-bold mb-4'>Ready to Start Learning?</h2>
-					<p className='max-w-2xl mx-auto mb-8'>
-						Join thousands of students and expand your knowledge with our
-						courses today
-					</p>
-					<Link href='/explore' prefetch={false}>
-						<Button variant='secondary' size='lg'>
-							<Compass className='mr-2 h-5 w-5' />
-							Explore Courses
-						</Button>
-					</Link>
-				</div>
-			</section>
+			<section className="bg-gradient-to-r from-primary/90 to-primary py-16 dark:from-primary/80 dark:to-primary/60">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4 text-white dark:text-gray-100">Ready to Start Learning?</h2>
+          <p className="max-w-2xl mx-auto mb-8 text-white/90 dark:text-gray-200">
+            Join thousands of students and expand your knowledge with our courses today
+          </p>
+          <Link href='/explore' prefetch={false}>
+            <Button variant='secondary' size='lg'>
+              <Compass className='mr-2 h-5 w-5' />
+              Explore Courses
+            </Button>
+          </Link>
+        </div>
+      </section>
 		</div>
 	)
 }
