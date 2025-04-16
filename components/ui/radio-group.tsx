@@ -7,8 +7,9 @@ const radioGroupVariants = cva(
 )
 
 export interface RadioGroupProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof radioGroupVariants> {
-  value?: string
-  onValueChange?: (value: string) => void
+  value?: string;
+  onValueChange?: (value: string) => void;
+  name?: string;
 }
 
 export const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
@@ -22,13 +23,16 @@ export const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
       >
         {React.Children.map(children, child => {
           if (React.isValidElement(child)) {
-            return React.cloneElement(child, {
-              checked: value === child.props.value,
-              onChange: () => onValueChange && onValueChange(child.props.value),
-              name: props.name,
-            })
+            const element = child as React.ReactElement<any, any>;
+            if (typeof element.props.value === "string") {
+              return React.cloneElement(element, {
+                checked: value === element.props.value,
+                onChange: () => onValueChange && onValueChange(element.props.value),
+                name: props.name,
+              });
+            }
           }
-          return child
+          return child;
         })}
       </div>
     )
@@ -37,7 +41,8 @@ export const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
 RadioGroup.displayName = "RadioGroup"
 
 export interface RadioGroupItemProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  value: string
+  value: string;
+  name?: string;
 }
 
 export const RadioGroupItem = React.forwardRef<HTMLInputElement, RadioGroupItemProps>(
