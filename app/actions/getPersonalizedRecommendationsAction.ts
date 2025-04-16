@@ -23,18 +23,18 @@ export async function getPersonalizedRecommendationsAction(userId: string) {
     }
 
     // Extract course titles, categories and topics for recommendation input
-    const completedCourseTitles = completions.map(completion => completion.course.title);
+    const completedCourseTitles = completions.map((completion: { course: { title: string } }) => completion.course.title);
     const completedCourseCategories = completions
-      .filter(completion => completion.course.category?.name)
-      .map(completion => completion.course.category?.name);
+      .filter((completion: { course: { category: { name: string } } }) => completion.course.category?.name)
+      .map((completion: { course: { category: { name: string } } }) => completion.course.category?.name);
 
     const enrolledCourseTitles = enrolledCourses
-      .filter(enrollment => enrollment.course?.title)
-      .map(enrollment => enrollment.course?.title);
+      .filter((enrollment: any) => enrollment.course && enrollment.course.title)
+      .map((enrollment: any) => enrollment.course.title);
     
     const enrolledCourseCategories = enrolledCourses
-      .filter(enrollment => enrollment.course?.category?.name)
-      .map(enrollment => enrollment.course?.category?.name);
+      .filter((enrollment: any) => enrollment.course && enrollment.course.category && enrollment.course.category.name)
+      .map((enrollment: any) => enrollment.course.category.name);
 
     // Combine all course data for analysis
     const allCourseTitles = [...new Set([...completedCourseTitles, ...enrolledCourseTitles])];
@@ -67,23 +67,23 @@ export async function getPersonalizedRecommendationsAction(userId: string) {
         success: true,
         hasHistory: true,
         recommendations: allCourses
-          .filter(course => !enrolledCourseIds.includes(course._id))
+          .filter((course: any) => !enrolledCourseIds.includes(course._id))
           .slice(0, 6)
       };
     }
 
     // Get courses based on AI recommendations
     const recommendedCourses = [];
-    for (const topic of recommendedTopics) {
+    for (const topic of recommendedTopics as string[]) {
       const topicCourses = await searchCourses(topic);
       recommendedCourses.push(...topicCourses);
     }
 
     // Filter out enrolled courses and remove duplicates
     const uniqueRecommendations = recommendedCourses
-      .filter(course => !enrolledCourseIds.includes(course._id))
+      .filter((course: any) => !enrolledCourseIds.includes(course._id))
       .filter((course, index, self) => 
-        index === self.findIndex(c => c._id === course._id)
+        index === self.findIndex((c: any) => c._id === course._id)
       )
       .slice(0, 6); // Limit to 6 recommendations
 
@@ -160,7 +160,7 @@ async function getAIRecommendations(prompt: string): Promise<string[]> {
     // Parse the comma-separated list of topics
     return recommendationsText
       .split(',')
-      .map(topic => topic.trim())
+      .map((topic: string) => topic.trim())
       .filter(Boolean);
   } catch (error) {
     console.error("Error calling GROQ API:", error);
