@@ -11,13 +11,9 @@ import React from 'react';
 import * as LucideIcons from 'lucide-react';
 
 
-const categoryIconMap: Record<string, React.FC<LucideIcons.LucideProps>> = {
-  BookOpen: LucideIcons.BookOpen,
-  Compass: LucideIcons.Compass,
-  GraduationCap: LucideIcons.GraduationCap,
-  Star: LucideIcons.Star,
-};
+// Removed categoryIconMap. Using LucideDynamicIcon everywhere for categories.
 import { BookOpen, Compass, GraduationCap, Star } from 'lucide-react';
+import LucideDynamicIcon from '@/components/LucideDynamicIcon';
 import Link from 'next/link'
 export const revalidate = 3600
 
@@ -98,14 +94,7 @@ export default async function Home() {
 									className='flex flex-col items-center justify-center p-6 rounded-lg bg-background border hover:shadow-md transition-all hover:border-primary'
 								>
 									<div className='p-4 bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mb-4'>
-										{(() => {
-  const iconKey = category.icon && category.icon.replace(/-([a-z])/g, (g: any) => g[1].toUpperCase()).replace(/^(.)/, (g: any) => g[0].toUpperCase());
-  const Icon = iconKey && categoryIconMap[iconKey];
-  if (Icon) {
-    return <Icon className='h-8 w-8' />;
-  }
-  return <LucideIcons.BookOpen className='h-8 w-8' />;
-})()}
+										<LucideDynamicIcon icon={category.icon} className="h-8 w-8" />
 									</div>
 									<span className='font-medium text-center'>
 										{category.name}

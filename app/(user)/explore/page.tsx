@@ -13,19 +13,8 @@ import {
 	PenTool,
 } from 'lucide-react'
 import Link from 'next/link'
-
-const categoryIcons: Record<string, React.FC<LucideProps>> = {
-	Technology: Code,
-	Business: Briefcase,
-	Design: PenTool,
-	Marketing: Globe,
-	Photography: Camera,
-	'Web Development': Code,
-	Entrepreneurship: Briefcase,
-	'Graphic Design': PenTool,
-	'Digital Marketing': Globe,
-	default: BookOpen,
-}
+import LucideDynamicIcon from '@/components/LucideDynamicIcon';
+// Removed categoryIcons mapping. Using LucideDynamicIcon instead.
 
 export default async function ExplorePage() {
 	const categories = await getCategories()
@@ -34,17 +23,12 @@ export default async function ExplorePage() {
 	return (
 		<div className='container mx-auto px-4 py-8 pt-16'>
 			<div className='flex items-center gap-4 mb-8'>
-				<Compass className='h-8 w-8 text-primary' />
+				<Compass className="h-8 w-8 text-primary mb-2" />
 				<h1 className='text-3xl font-bold'>Explore Courses</h1>
 			</div>
 
 			<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8'>
 				{categories.map(category => {
-					const CategoryIcon =
-						categoryIcons[category.name] || categoryIcons['default']
-
-					console.log(`Category ${category.name} slug:`, category.slug)
-
 					const slugValue =
 						typeof category.slug === 'string'
 							? category.slug
@@ -66,7 +50,7 @@ export default async function ExplorePage() {
 										color: category.color || 'text-muted-foreground',
 									}}
 								>
-									<CategoryIcon className='h-6 w-6' />
+									<LucideDynamicIcon icon={category.icon} className='h-6 w-6' />
 								</div>
 								<h3 className='text-lg font-semibold group-hover:text-primary transition-colors'>
 									{category.name}

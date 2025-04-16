@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/select'
 import React from 'react';
 import * as LucideIcons from 'lucide-react';
+import LucideDynamicIcon from '@/components/LucideDynamicIcon';
 import { Loader2 } from 'lucide-react';
 import { BookOpen } from 'lucide-react';
 
@@ -66,11 +67,7 @@ export default function CategorySelect({
 								style={{ backgroundColor: category.color }}
 							/>
 						) : null}
-						{category.icon && LucideIcons[category.icon.replace(/-([a-z])/g, (g: any) => g[1].toUpperCase()).replace(/^(.)/, (g: any) => g[0].toUpperCase())] ? (
-							React.createElement(LucideIcons[category.icon.replace(/-([a-z])/g, (g: any) => g[1].toUpperCase()).replace(/^(.)/, (g: any) => g[0].toUpperCase())], { className: 'inline-block w-4 h-4 mr-2 align-text-bottom' })
-						) : (
-							<LucideIcons.BookOpen className='inline-block w-4 h-4 mr-2 align-text-bottom' />
-						)}
+						<LucideDynamicIcon icon={category.icon} className="inline-block w-4 h-4 mr-2 align-text-bottom" />
 						{category.name}
 					</SelectItem>
 				))}
