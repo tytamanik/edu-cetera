@@ -29,6 +29,7 @@ export default function BecomeInstructor() {
 	const [isInstructor, setIsInstructor] = useState(false)
 	const [isChecking, setIsChecking] = useState(true)
 	const [isPending, startTransition] = useTransition()
+	const [error, setError] = useState<string | null>(null)
 
 	useEffect(() => {
 		if (isLoaded && user?.id) {
@@ -45,23 +46,48 @@ export default function BecomeInstructor() {
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 
-		if (!user?.id) return
+		if (!user?.id) {
+			setError("User not authenticated")
+			return
+		}
 
 		const formData = new FormData(event.currentTarget)
+		
+		// Get the user's email
+		const userEmail = user.emailAddresses?.[0]?.emailAddress
+		if (userEmail) {
+			formData.append('email', userEmail)
+		}
 
+		const name = formData.get('name') as string
+		const bio = formData.get('bio') as string
+
+		if (!name || !bio) {
+			setError("Name and bio are required")
+			return
+		}
+
+		setError(null)
+		
 		startTransition(async () => {
-			const result = await becomeInstructorAction(formData, user.id)
+			try {
+				const result = await becomeInstructorAction(formData, user.id)
 
-			if (result.success) {
-				setIsInstructor(true)
-				setOpen(false)
-				router.refresh()
+				if (result.success) {
+					setIsInstructor(true)
+					setOpen(false)
+					router.refresh()
 
-				setTimeout(() => {
-					router.push('/creator-dashboard')
-				}, 500)
-			} else {
-				console.error('Failed to become instructor:', result.error)
+					setTimeout(() => {
+						router.push('/creator-dashboard')
+					}, 500)
+				} else {
+					setError(result.error as string || 'Failed to become an instructor')
+					console.error('Failed to become instructor:', result.error)
+				}
+			} catch (err) {
+				setError("An unexpected error occurred")
+				console.error('Error submitting form:', err)
 			}
 		})
 	}
@@ -106,6 +132,11 @@ export default function BecomeInstructor() {
 					</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={handleSubmit} className='space-y-4 py-4'>
+					{error && (
+						<div className='bg-red-50 text-red-600 p-3 rounded-md text-sm'>
+							{error}
+						</div>
+					)}
 					<div className='space-y-2'>
 						<Label htmlFor='name'>Display Name</Label>
 						<Input
@@ -126,7 +157,6 @@ export default function BecomeInstructor() {
 							required
 						/>
 					</div>
-					{/* Photo upload would go here in a real implementation */}
 					<DialogFooter>
 						<Button type='submit' disabled={isPending}>
 							{isPending ? (

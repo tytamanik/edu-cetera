@@ -1,3 +1,4 @@
+// Place this in app/(creator)/become-instructor/page.tsx
 import { checkInstructorStatusAction } from '@/app/actions/instructorActions'
 import BecomeInstructorForm from '@/components/BecomeInstructorForm'
 import { currentUser } from '@clerk/nextjs/server'
@@ -16,6 +17,9 @@ export default async function BecomeInstructorPage() {
 		return redirect('/creator-dashboard')
 	}
 
+	// Get user's email from their primary email address
+	const userEmail = user.emailAddresses[0]?.emailAddress || ''
+
 	return (
 		<div className='container mx-auto px-4 py-12 mt-16 max-w-3xl'>
 			<div className='bg-card rounded-lg shadow-lg p-8 border'>
@@ -29,6 +33,7 @@ export default async function BecomeInstructorPage() {
 				<BecomeInstructorForm
 					userId={user.id}
 					userName={`${user.firstName || ''} ${user.lastName || ''}`}
+					userEmail={userEmail} // Pass the email
 				/>
 			</div>
 		</div>

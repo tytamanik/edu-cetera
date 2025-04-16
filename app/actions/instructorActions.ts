@@ -12,6 +12,7 @@ import { isUserInstructor } from '@/sanity/lib/instructor/isUserInstructor'
 import { getStudentByClerkId } from '@/sanity/lib/student/getStudentByClerkId'
 import { revalidatePath } from 'next/cache'
 
+
 export async function becomeInstructorAction(
 	formData: FormData,
 	clerkId: string
@@ -19,15 +20,19 @@ export async function becomeInstructorAction(
 	try {
 		const name = formData.get('name') as string
 		const bio = formData.get('bio') as string
+		const email = formData.get('email') as string
 
 		if (!name || !bio) {
 			return { success: false, error: 'Name and bio are required' }
 		}
 
+		console.log('Creating instructor with email:', email); // Add for debugging
+
 		const result = await createInstructorFromUser({
 			clerkId,
 			name,
 			bio,
+			email,
 		})
 
 		if (result.success) {
@@ -39,7 +44,10 @@ export async function becomeInstructorAction(
 		return result
 	} catch (error) {
 		console.error('Error in becomeInstructorAction:', error)
-		return { success: false, error: 'Failed to become an instructor' }
+		return { 
+			success: false, 
+			error: error instanceof Error ? error.message : 'Failed to become an instructor' 
+		}
 	}
 }
 

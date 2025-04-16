@@ -12,11 +12,13 @@ import { useState, useTransition } from 'react'
 interface BecomeInstructorFormProps {
 	userId: string
 	userName: string
+	userEmail: string
 }
 
 export default function BecomeInstructorForm({
 	userId,
 	userName,
+	userEmail,
 }: BecomeInstructorFormProps) {
 	const router = useRouter()
 	const [isPending, startTransition] = useTransition()
@@ -25,6 +27,11 @@ export default function BecomeInstructorForm({
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		const formData = new FormData(e.currentTarget)
+		
+		// Explicitly add email to form data
+		if (userEmail) {
+			formData.append('email', userEmail)
+		}
 
 		const name = formData.get('name') as string
 		const bio = formData.get('bio') as string
@@ -89,6 +96,10 @@ export default function BecomeInstructorForm({
 					are right for them
 				</p>
 			</div>
+
+			{userEmail && (
+				<input type="hidden" name="email" value={userEmail} />
+			)}
 
 			<Button type='submit' className='w-full' disabled={isPending}>
 				{isPending ? (
